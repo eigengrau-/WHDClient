@@ -57,6 +57,27 @@ public partial class TicketTabViewModel : TabViewModelBase
     [ObservableProperty] private bool _replyEmailTech;
     [ObservableProperty] private bool _replyAlsoSetStatus;
 
+    // Cc recipients on the reply (searched from techs + clients, sent as email addresses)
+    [ObservableProperty] private string _ccSearchText = "";
+    [ObservableProperty] private bool _isSearchingCc;
+    [ObservableProperty] private CcRecipient? _selectedCcResult;
+    public ObservableCollection<CcRecipient> CcResults { get; } = new();
+    public ObservableCollection<CcRecipient> CcRecipients { get; } = new();
+
+    /// <summary>Raised (on the UI thread) after a Cc search completes; the view opens the results dropdown.</summary>
+    public event Action? CcSearchCompleted;
+
+    // Picking a search result moves it into the recipient list.
+    partial void OnSelectedCcResultChanged(CcRecipient? value)
+    {
+        if (value == null) return;
+        if (!CcRecipients.Any(r => r.Email.Equals(value.Email, StringComparison.OrdinalIgnoreCase)))
+            CcRecipients.Add(value);
+        SelectedCcResult = null;
+        CcSearchText = "";
+        CcResults.Clear();
+    }
+
     /// <summary>Files staged in the reply panel; uploaded onto the note when it is posted.</summary>
     public ObservableCollection<string> PendingReplyAttachments { get; } = new();
 
@@ -212,6 +233,10 @@ public partial class TicketTabViewModel : TabViewModelBase
                 IsSolution = ReplyIsSolution,
                 EmailClient = ReplyEmailClient,
                 EmailTech = ReplyEmailTech,
+                EmailCc = CcRecipients.Count > 0,
+                CcAddressesForTech = CcRecipients.Count > 0
+                    ? string.Join(",", CcRecipients.Select(r => r.Email))
+                    : null,
                 StatusTypeId = ReplyAlsoSetStatus && SelectedStatus != null ? SelectedStatus.Id : null
             };
             var created = await _session.Tickets.AddTechNoteAsync(note);
@@ -243,6 +268,7 @@ public partial class TicketTabViewModel : TabViewModelBase
 
             ReplyText = "";
             PendingReplyAttachments.Clear();
+            CcRecipients.Clear();
             InfoMessage = uploadFailures.Count == 0
                 ? "Note added."
                 : $"Note added, but {uploadFailures.Count} attachment(s) failed: {string.Join("; ", uploadFailures)}";
@@ -256,6 +282,39 @@ public partial class TicketTabViewModel : TabViewModelBase
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task SearchCcAsync()
+    {
+        var fragment = CcSearchText.Trim();
+        if (fragment.Length < 2 || IsSearchingCc) return;
+        IsSearchingCc = true;
+        try
+        {
+            var techs = await _session.Lookups.GetTechsAsync(fragment);
+            var clients = await _session.Lookups.SearchClientsAsync(fragment);
+            CcResults.Clear();
+            foreach (var t in techs.Where(t => !string.IsNullOrEmpty(t.Email)))
+                CcResults.Add(new CcRecipient { Email = t.Email!, Name = t.DisplayName, Kind = "Tech" });
+            foreach (var c in clients.Where(c => !string.IsNullOrEmpty(c.Email)))
+                CcResults.Add(new CcRecipient { Email = c.Email!, Name = c.DisplayName, Kind = "Client" });
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Cc search failed: {ex.Message}";
+        }
+        finally
+        {
+            IsSearchingCc = false;
+            CcSearchCompleted?.Invoke();
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveCcRecipient(CcRecipient? recipient)
+    {
+        if (recipient != null) CcRecipients.Remove(recipient);
     }
 
     [RelayCommand]
@@ -314,4 +373,16 @@ public partial class TicketTabViewModel : TabViewModelBase
         IsBookmarked = ids.Contains(TicketId);
         _bookmarkChanged?.Invoke();
     }
+}
+
+/// <summary>A Cc recipient picked from techs/clients; WHD wants the email address.</summary>
+public class CcRecipient
+{
+    public required string Email { get; init; }
+    public required string Name { get; init; }
+    /// <summary>"Tech" or "Client".</summary>
+    public required string Kind { get; init; }
+
+    /// <summary>Matches the web UI's format: "email (Name)".</summary>
+    public string Label => $"{Email} ({Name})";
 }

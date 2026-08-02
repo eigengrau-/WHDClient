@@ -107,6 +107,8 @@ internal static class DemoData
 
     public static readonly List<Client> Clients = new()
     {
+        // The demo tech's client record — lets "default reporter to current user" work in demo mode.
+        new() { Id = 100, Type = "Client", FirstName = "Alex", LastName = "Morgan", Username = "amorgan", Email = "amorgan@example.com" },
         new() { Id = 101, Type = "Client", FirstName = "Harper", LastName = "Quinn", Username = "hquinn", Email = "hquinn@example.com" },
         new() { Id = 102, Type = "Client", FirstName = "Finley", LastName = "Brooks", Username = "fbrooks", Email = "fbrooks@example.com" },
         new() { Id = 103, Type = "Client", FirstName = "Rowan", LastName = "Ellis", Username = "rellis", Email = "rellis@example.com" },

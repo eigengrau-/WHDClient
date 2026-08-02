@@ -39,6 +39,31 @@ public partial class CreateTicketViewModel : TabViewModelBase
     [ObservableProperty] private Tech? _selectedTech;
     [ObservableProperty] private bool _assignToMe = true;
 
+    // Guards re-entrancy while "Assign to me" and the Tech dropdown keep each other in sync.
+    private bool _syncingTech;
+
+    partial void OnAssignToMeChanged(bool value)
+    {
+        if (_syncingTech) return;
+        _syncingTech = true;
+        try
+        {
+            if (value)
+                SelectedTech = Techs.FirstOrDefault(t => t.Id == _session.CurrentTech.Id) ?? SelectedTech;
+            else if (SelectedTech?.Id == _session.CurrentTech.Id)
+                SelectedTech = null;
+        }
+        finally { _syncingTech = false; }
+    }
+
+    partial void OnSelectedTechChanged(Tech? value)
+    {
+        if (_syncingTech) return;
+        _syncingTech = true;
+        try { AssignToMe = value != null && value.Id == _session.CurrentTech.Id; }
+        finally { _syncingTech = false; }
+    }
+
     public CreateTicketViewModel(WhdSessionContext session, Action<int> onCreated)
     {
         _session = session;
@@ -58,6 +83,13 @@ public partial class CreateTicketViewModel : TabViewModelBase
             foreach (var l in await _session.Lookups.GetLocationsAsync()) Locations.Add(l);
             foreach (var t in await _session.Lookups.GetActiveTechsAsync()) Techs.Add(t);
 
+            // "Assign to me" defaults on — reflect it in the Tech dropdown.
+            if (AssignToMe) OnAssignToMeChanged(true);
+
+            // The reporter defaults to the current user (techs are clients too);
+            // a ticket cannot be created without a client.
+            await DefaultClientToCurrentUserAsync();
+
             // Dev/test hook: WHD_NEW_TICKET_REQUEST_TYPE=<id> pre-selects a request type path.
             var preselect = Environment.GetEnvironmentVariable("WHD_NEW_TICKET_REQUEST_TYPE");
             if (int.TryParse(preselect, out var rtId)) RequestTypePicker.SetSelectedRequestType(rtId);
@@ -65,6 +97,29 @@ public partial class CreateTicketViewModel : TabViewModelBase
         catch (Exception ex)
         {
             ErrorMessage = $"Failed to load lookups: {ex.Message}";
+        }
+    }
+
+    /// <summary>Finds the client record matching the signed-in tech (by email, then name) and selects it.</summary>
+    private async Task DefaultClientToCurrentUserAsync()
+    {
+        try
+        {
+            var tech = _session.CurrentTech;
+            var matches = await _session.Lookups.SearchClientsAsync(
+                !string.IsNullOrWhiteSpace(tech.Email) ? tech.Email : tech.DisplayName);
+            SelectedClient = matches.FirstOrDefault(c =>
+                                 string.Equals(c.Email, tech.Email, StringComparison.OrdinalIgnoreCase))
+                             ?? matches.FirstOrDefault(c =>
+                                 string.Equals(c.DisplayName, tech.DisplayName, StringComparison.OrdinalIgnoreCase))
+                             ?? matches.FirstOrDefault();
+            // The combo only renders selections that exist in its ItemsSource.
+            if (SelectedClient != null && !ClientResults.Contains(SelectedClient))
+                ClientResults.Insert(0, SelectedClient);
+        }
+        catch
+        {
+            // Non-fatal — the user can still pick a client manually.
         }
     }
 
@@ -113,6 +168,7 @@ public partial class CreateTicketViewModel : TabViewModelBase
         ErrorMessage = null;
         if (string.IsNullOrWhiteSpace(Subject)) { ErrorMessage = "Subject is required."; return; }
         if (RequestTypePicker.SelectedRequestType == null) { ErrorMessage = "Request type is required."; return; }
+        if (SelectedClient?.Id == null) { ErrorMessage = "Client is required — search and select a reporter."; return; }
 
         IsBusy = true;
         try
