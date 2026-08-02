@@ -1,0 +1,17 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <!--
+    WiX MSI installer for WHD Client.
+    Build via build-installer.ps1 (publishes the app self-contained, then packages it).
+    Not part of WHDClient.sln so normal builds don't need the publish output to exist.
+  -->
+  <PropertyGroup>
+    <OutputName>WHDClient-Setup</OutputName>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildProjectDirectory)\publish</PublishDir>
+  </PropertyGroup>
+
+  <!-- WixUI_Minimal gives a welcome/install dialog and a "setup completed" page on finish -->
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+  </ItemGroup>
+</Project>

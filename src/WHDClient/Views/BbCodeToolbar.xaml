@@ -1,0 +1,27 @@
+<UserControl x:Class="WHDClient.Views.BbCodeToolbar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- BBCode insert/wrap buttons, mirroring the Web Help Desk editor toolbar -->
+    <StackPanel Orientation="Horizontal">
+        <Button Click="Bold_Click" ToolTip="Bold  [b]" AutomationProperties.Name="Bold"
+                Padding="7,1" Margin="0,0,2,0" FontWeight="Bold" Content="B"/>
+        <Button Click="Italic_Click" ToolTip="Italic  [i]" AutomationProperties.Name="Italic"
+                Padding="7,1" Margin="0,0,2,0" FontStyle="Italic" FontFamily="Georgia" Content="I"/>
+        <Button Click="Underline_Click" ToolTip="Underline  [u]" AutomationProperties.Name="Underline"
+                Padding="7,1" Margin="0,0,2,0">
+            <TextBlock Text="U" TextDecorations="Underline"/>
+        </Button>
+        <Button Click="BulletList_Click" ToolTip="Bulleted list  [list]" AutomationProperties.Name="Bulleted list"
+                Padding="7,1" Margin="6,0,2,0" Content="• ≡"/>
+        <Button Click="NumberedList_Click" ToolTip="Numbered list  [list=1]" AutomationProperties.Name="Numbered list"
+                Padding="7,1" Margin="0,0,2,0" Content="1. ≡"/>
+        <Button Click="Code_Click" ToolTip="Code block  [code]" AutomationProperties.Name="Code block"
+                Padding="7,1" Margin="6,0,2,0" FontFamily="Consolas" Content="&lt;/&gt;"/>
+        <Button Click="Quote_Click" ToolTip="Quote  [quote]" AutomationProperties.Name="Quote"
+                Padding="7,1" Margin="0,0,2,0" Content="❝"/>
+        <Button Click="Image_Click" ToolTip="Image  [img]" AutomationProperties.Name="Image"
+                Padding="7,1" Margin="6,0,2,0" Content="🖼"/>
+        <Button Click="Link_Click" ToolTip="Link  [url]" AutomationProperties.Name="Link"
+                Padding="7,1" Margin="0,0,2,0" Content="🔗"/>
+    </StackPanel>
+</UserControl>

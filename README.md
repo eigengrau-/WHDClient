@@ -1,0 +1,81 @@
+# WHD Client
+
+A Windows desktop client for [SolarWinds Web Help Desk](https://www.solarwinds.com/web-help-desk) (WHD) ticketing system, built with C# and WPF on .NET 9.
+
+Designed to monitor incoming and assigned tickets, alert you when things change, and allows you work on tickets without touching the web UI.
+
+## Features
+
+- **Ticket tabs**: Open multiple tickets side by side; reply with notes, change status/priority, add attachments, open in browser
+- **Notifications**: Windows toast notifications when a ticket is assigned to you, one of your tickets is updated, or a new ticket matches an alert filter
+- **Search/Alert Filters**: Create and save a search and then enable notifications for the filter in the settings page to receive notifications
+- **Auto-refresh**: Ticket information is automatically refreshed on a configurable poll interval
+- **Dark theme**: No more burnt retinas!
+
+## Pages
+
+- **My Tickets**: Tickets assigned to you
+- **Ticket Queue**: All open tickets across every tech group, with pagination
+- **Search**: Full ticket search plus a raw advanced-qualifier box; searches can be saved as named filters
+- **New Ticket**: Create tickets with cascading request-type selection, client lookup, priority/location/tech assignment, BBCode editor, and file attachments
+- **Bookmarks**: Pin tickets you keep coming back to
+
+## Install
+
+[Click here to download the installer](https://github.com/eigengrau-/WHDClient/releases/download/v1.0.0/WHDClient-Setup.msi)
+
+## Requirements
+
+- Windows 10 (17763) or later
+- [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/9.0) (only if running without the installer; the MSI bundles what it needs)
+- A Web Help Desk instance (tested against WHD 12.x) and a **tech API key**
+
+## Getting a WHD API key
+
+In the WHD web UI, sign in as a tech and open your account setup page:
+
+```
+https://<your-whd-server>/helpdesk/WebObjects/Helpdesk.woa/wa/Nav?path=setup-techs-myaccount
+```
+
+Generate/copy the API key there, then paste it into the WHD Client sign-in window along with your WHD server URL.
+
+## API key security
+
+WHD tech API keys grant full API access as that tech. Ttreat them like a password.
+
+- **At rest:** if you choose "remember me" at sign-in, the key is encrypted with Windows DPAPI (`ProtectedData`, `CurrentUser` scope) before being written to `%APPDATA%\WHDClient\settings.json`. It can only be decrypted by the same Windows user account on the same machine. The plaintext key is never written to disk.
+- **In transit:** the key is sent only to the WHD server URL you configured, over HTTPS, as the `apiKey` parameter on WHD REST API requests. It is never sent anywhere else and never written to logs.
+
+## Build from source
+
+Requires the .NET 9 SDK.
+
+```powershell
+dotnet build WHDClient.sln
+dotnet test WHDClient.sln          # core unit tests
+dotnet run --project src/WHDClient # launch the app
+```
+
+### Installer (MSI)
+
+Requires [WiX Toolset](https://wixtoolset.org/) (`wix` .NET tool). Builds a self-contained x64 MSI:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File installer/build-installer.ps1
+# output: installer/bin/Release/WHDClient-Setup.msi
+```
+
+## Project layout
+
+```
+src/WHDClient/          WPF app (MVVM, CommunityToolkit.Mvvm) — views, view models, theme
+src/WHDClient.Core/     UI-independent library: WHD REST API client, models, qualifier
+                        builder, BBCode parser, change detection
+tests/                  xUnit tests for WHDClient.Core
+installer/              WiX project + script that produces WHDClient-Setup.msi
+```
+
+## Notes
+
+- Saved searches/filters, bookmarks, and settings are stored per-user in `%APPDATA%\WHDClient\settings.json`.

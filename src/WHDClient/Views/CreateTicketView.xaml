@@ -1,0 +1,122 @@
+<UserControl x:Class="WHDClient.Views.CreateTicketView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:WHDClient.Views">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="16" Width="900" HorizontalAlignment="Left" MinWidth="520">
+            <TextBlock Text="Create ticket" Style="{StaticResource HeaderText}" Margin="0,0,0,10"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Subject *" VerticalAlignment="Center" Margin="0,4"/>
+                <TextBox Grid.Column="1" Text="{Binding Subject, UpdateSourceTrigger=PropertyChanged}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="1" Text="Details" VerticalAlignment="Top" Margin="0,8,0,4"/>
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,4">
+                    <views:BbCodeToolbar Target="{Binding ElementName=DetailBox}" HorizontalAlignment="Left" Margin="0,0,0,2"/>
+                    <TextBox x:Name="DetailBox" Text="{Binding Detail, UpdateSourceTrigger=PropertyChanged}"
+                             AcceptsReturn="True" TextWrapping="Wrap" MinHeight="110"
+                             VerticalContentAlignment="Top"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Text="Request type *" VerticalAlignment="Center" Margin="0,4"/>
+                <views:RequestTypePicker Grid.Row="2" Grid.Column="1" DataContext="{Binding RequestTypePicker}"
+                                         Margin="0,2" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Row="3" Text="Client (reporter)" VerticalAlignment="Center" Margin="0,4"/>
+                <Grid Grid.Row="3" Grid.Column="1" Margin="0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Text="{Binding ClientSearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="1" Command="{Binding SearchClientsCommand}"
+                            AutomationProperties.Name="Find" Margin="6,0,0,0" Padding="12,4">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="pack://application:,,,/Assets/icons/search.png" Width="13" Height="13" Margin="0,0,6,0"/>
+                            <TextBlock Text="Find" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <ProgressBar Grid.ColumnSpan="2" IsIndeterminate="True" Margin="0,2,0,0"
+                                 VerticalAlignment="Bottom"
+                                 Visibility="{Binding IsSearchingClients, Converter={StaticResource BoolToVisConverter}}"/>
+                </Grid>
+
+                <TextBlock Grid.Row="4" Text=" " VerticalAlignment="Center" Margin="0,4"/>
+                <Grid Grid.Row="4" Grid.Column="1" Margin="0,4">
+                    <ComboBox x:Name="ClientCombo" ItemsSource="{Binding ClientResults}"
+                              SelectedItem="{Binding SelectedClient}" DisplayMemberPath="DisplayName"
+                              MaxDropDownHeight="300"/>
+                    <TextBlock Text="No Client" Style="{StaticResource DimText}" IsHitTestVisible="False"
+                               VerticalAlignment="Center" Margin="10,0,0,0"
+                               Visibility="{Binding SelectedClient, Converter={StaticResource NullToVisConverter}, ConverterParameter=invert}"/>
+                </Grid>
+
+                <TextBlock Grid.Row="5" Text="Priority" VerticalAlignment="Center" Margin="0,4"/>
+                <ComboBox Grid.Row="5" Grid.Column="1" ItemsSource="{Binding PriorityTypes}"
+                          SelectedItem="{Binding SelectedPriority}" DisplayMemberPath="DisplayName" Margin="0,4"/>
+
+                <TextBlock Grid.Row="6" Text="Location" VerticalAlignment="Center" Margin="0,4"/>
+                <ComboBox Grid.Row="6" Grid.Column="1" ItemsSource="{Binding Locations}"
+                          SelectedItem="{Binding SelectedLocation}" DisplayMemberPath="DisplayName"
+                          Margin="0,4" MaxDropDownHeight="400"/>
+
+                <TextBlock Grid.Row="7" Text="Tech" VerticalAlignment="Center" Margin="0,4"/>
+                <ComboBox Grid.Row="7" Grid.Column="1" ItemsSource="{Binding Techs}"
+                          SelectedItem="{Binding SelectedTech}" DisplayMemberPath="ListDisplayName"
+                          Margin="0,4" MaxDropDownHeight="400"/>
+
+                <TextBlock Grid.Row="8" Text="Attachments" VerticalAlignment="Top" Margin="0,8,0,4"/>
+                <StackPanel Grid.Row="8" Grid.Column="1" Margin="0,4">
+                    <Button Content="+ Add files" Command="{Binding AddAttachmentsCommand}"
+                            Padding="10,3" HorizontalAlignment="Left"/>
+                    <ItemsControl ItemsSource="{Binding PendingAttachments}" Margin="0,4,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel Margin="0,1">
+                                    <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="10"
+                                            Background="Transparent" BorderThickness="0"
+                                            Command="{Binding DataContext.RemoveAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"/>
+                                    <TextBlock Text="{Binding}" Style="{StaticResource DimText}" FontSize="12"
+                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Grid>
+
+            <CheckBox Content="Assign to me" IsChecked="{Binding AssignToMe}" Margin="0,8,0,0"/>
+
+            <Button Style="{StaticResource AccentButton}"
+                    AutomationProperties.Name="Create ticket"
+                    Command="{Binding CreateCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                    Margin="0,14,0,0" Padding="16,8" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="pack://application:,,,/Assets/icons/new-ticket.png" Width="15" Height="15" Margin="0,0,8,0"/>
+                    <TextBlock Text="Create ticket" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <ProgressBar IsIndeterminate="True" Margin="0,10,0,0"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisConverter}}"/>
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#c0504d" Margin="0,8,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,61 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <!--
+    WHD Client MSI package.
+    UpgradeCode must stay constant so new MSIs upgrade older installs (MajorUpgrade).
+    Bump Package Version for each release.
+  -->
+  <Package Name="WHD Client"
+           Language="1033"
+           Version="1.0.0"
+           Manufacturer="WHD Client"
+           UpgradeCode="3ecb923e-8430-4cb4-83e3-0d3c7087ac3f"
+           Scope="perMachine">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of WHD Client is already installed." />
+    <Media Id="1" Cabinet="whdclient.cab" EmbedCab="yes" />
+    <ui:WixUI Id="WixUI_Minimal" />
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+    <Feature Id="Main" Title="WHD Client" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="WHDClient" />
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="StartMenuDir" Name="WHD Client" />
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <!-- Everything produced by `dotnet publish` (single-file, self-contained exe) -->
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <Files Include="publish\**" />
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="StartMenuShortcut" Directory="StartMenuDir" Guid="*">
+      <Shortcut Name="WHD Client"
+                Description="Web Help Desk monitoring client"
+                Target="[INSTALLFOLDER]WHDClient.exe"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RemoveFolder Id="StartMenuDir" On="uninstall" />
+      <RegistryValue Root="HKCU" Key="Software\WHDClient" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="*">
+      <Shortcut Name="WHD Client"
+                Description="Web Help Desk monitoring client"
+                Target="[INSTALLFOLDER]WHDClient.exe"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RegistryValue Root="HKCU" Key="Software\WHDClient" Name="desktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+  </Fragment>
+</Wix>

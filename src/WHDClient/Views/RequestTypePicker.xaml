@@ -1,0 +1,22 @@
+<UserControl x:Class="WHDClient.Views.RequestTypePicker"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Cascading ComboBoxes: one per hierarchy level, child levels appear only after a parent is chosen. -->
+    <ItemsControl ItemsSource="{Binding Levels}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <ComboBox ItemsSource="{Binding Items}"
+                          SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                          DisplayMemberPath="DisplayName"
+                          MinWidth="160" MaxWidth="280"
+                          Margin="0,2,6,2" MaxDropDownHeight="400"
+                          VerticalAlignment="Center"/>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>
