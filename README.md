@@ -24,41 +24,41 @@ Designed to monitor incoming and assigned tickets, alert you when things change,
 
 ## Screenshots
 
-Taken in demo mode (`WHD_DEMO=1`) — every name, school, and ticket is fabricated.
+Taken in demo mode (`WHD_DEMO=1`): every name, school, and ticket is fabricated.
 
-**Sign in** — server URL + tech API key (masked, optionally remembered encrypted)
+**Sign in**: server URL + tech API key (masked, optionally remembered encrypted)
 
 ![Sign in](docs/screenshots/login.png)
 
-**My Tickets** — tickets assigned to you, auto-refreshed, with colour-coded status/priority dots and column sorting
+**My Tickets**: tickets assigned to you, auto-refreshed, with colour-coded status/priority dots and column sorting
 
 ![My Tickets](docs/screenshots/my-tickets.png)
 
-**Ticket detail** — BBCode-rendered request details, notes thread (newest first), attachments, reply editor with BBCode toolbar, bookmark and open-in-browser buttons
+**Ticket detail**: BBCode-rendered request details, notes thread (newest first), attachments, reply editor with BBCode toolbar, bookmark and open-in-browser buttons
 
 ![Ticket detail](docs/screenshots/ticket-detail.png)
 
-**Ticket Queue** — every open ticket across all tech groups, with pagination
+**Ticket Queue**: every open ticket across all tech groups, with pagination
 
 ![Ticket Queue](docs/screenshots/queue.png)
 
-**Search** — field filters, cascading request type, raw advanced qualifier, and savable named filters
+**Search**: field filters, cascading request type, raw advanced qualifier, and savable named filters
 
 ![Search](docs/screenshots/search.png)
 
-**New Ticket** — cascading request types, client lookup, tech assignment, BBCode editor, attachments
+**New Ticket**: cascading request types, client lookup, tech assignment, BBCode editor, attachments
 
 ![New Ticket](docs/screenshots/new-ticket.png)
 
-**Bookmarks** — quick access to tickets you follow, with one-click removal
+**Bookmarks**: quick access to tickets you follow, with one-click removal
 
 ![Bookmarks](docs/screenshots/bookmarks.png)
 
-**Notifications** — in-app feed plus Windows toasts for assignments, updates, filter matches, and app updates
+**Notifications**: in-app feed plus Windows toasts for assignments, updates, filter matches, and app updates
 
 ![Notifications](docs/screenshots/notifications.png)
 
-**Settings** — connection, polling, page size, notification alerts, and update checking
+**Settings**: connection, polling, page size, notification alerts, and update checking
 
 ![Settings](docs/screenshots/settings.png)
 
@@ -97,7 +97,7 @@ dotnet run --project src/WHDClient # launch the app
 
 ### Demo mode
 
-To try the app without a WHD server (or take screenshots without real data), set `WHD_DEMO=1` — the app then serves fabricated tickets, people, and lookups locally. Any server URL and API key are accepted, and nothing is read from or written to a real server or your real settings:
+To try the app without a WHD server (or take screenshots without real data), set `WHD_DEMO=1`; the app then serves fabricated tickets, people, and lookups locally. Any server URL and API key are accepted, and nothing is read from or written to a real server or your real settings:
 
 ```powershell
 $env:WHD_DEMO = 1
@@ -116,7 +116,7 @@ powershell -ExecutionPolicy Bypass -File installer/build-installer.ps1
 ## Project layout
 
 ```
-src/WHDClient/          WPF app (MVVM, CommunityToolkit.Mvvm) — views, view models, theme
+src/WHDClient/          WPF app (MVVM, CommunityToolkit.Mvvm): views, view models, theme
 src/WHDClient.Core/     UI-independent library: WHD REST API client, models, qualifier
                         builder, BBCode parser, change detection
 tests/                  xUnit tests for WHDClient.Core
