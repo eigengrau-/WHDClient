@@ -6,29 +6,16 @@ Designed to monitor incoming and assigned tickets, alert you when things change,
 
 **[Download the latest MSI installer here!](https://github.com/eigengrau-/WHDClient/releases/latest)**
 
-## Features
-
-- **Ticket tabs**: Open multiple tickets side by side; reply with notes, change status/priority, add attachments, open in browser
-- **Notifications**: Windows toast notifications when a ticket is assigned to you, one of your tickets is updated, or a new ticket matches an alert filter
-- **Search/Alert Filters**: Create and save a search and then enable notifications for the filter in the settings page to receive notifications
-- **Auto-refresh**: Ticket information is automatically refreshed on a configurable poll interval
-- **Dark theme**: No more burnt retinas!
-
-## Pages
-
-- **My Tickets**: Tickets assigned to you
-- **Ticket Queue**: All open tickets across every tech group, with pagination
-- **Search**: Full ticket search plus a raw advanced-qualifier box; searches can be saved as named filters
-- **New Ticket**: Create tickets with cascading request-type selection, client lookup, priority/location/tech assignment, BBCode editor, and file attachments
-- **Bookmarks**: Pin tickets you keep coming back to
-
 ## Screenshots
 
-Taken in demo mode (`WHD_DEMO=1`): every name, school, and ticket is fabricated.
+<details>
+<summary>Expand to view</summary>
+
+Taken in demo mode (`WHD_DEMO=1`): every name, location, and ticket is fabricated.
 
 **Sign in**: server URL + tech API key (masked, optionally remembered encrypted)
 
-![Sign in](docs/screenshots/login.png)
+[<img src="docs/screenshots/login.png" width="50%"/>](docs/screenshots/login.png)
 
 **My Tickets**: tickets assigned to you, auto-refreshed, with colour-coded status/priority dots and column sorting
 
@@ -61,6 +48,24 @@ Taken in demo mode (`WHD_DEMO=1`): every name, school, and ticket is fabricated.
 **Settings**: connection, polling, page size, notification alerts, and update checking
 
 ![Settings](docs/screenshots/settings.png)
+
+</details>
+
+## Features
+
+- **Ticket tabs**: Open multiple tickets side by side; reply with notes, change status/priority, add attachments, open in browser
+- **Notifications**: Windows toast notifications when a ticket is assigned to you, one of your tickets is updated, or a new ticket matches an alert filter
+- **Search/Alert Filters**: Create and save a search and then enable notifications for the filter in the settings page to receive notifications
+- **Auto-refresh**: Ticket information is automatically refreshed on a configurable poll interval
+- **Dark theme**: No more burnt retinas!
+
+## Pages
+
+- **My Tickets**: Tickets assigned to you
+- **Ticket Queue**: All open tickets across every tech group, with pagination
+- **Search**: Full ticket search plus a raw advanced-qualifier box; searches can be saved as named filters
+- **New Ticket**: Create tickets with cascading request-type selection, client lookup, priority/location/tech assignment, BBCode editor, and file attachments
+- **Bookmarks**: Pin tickets you keep coming back to
 
 ## Requirements
 
