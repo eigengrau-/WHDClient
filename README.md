@@ -1,6 +1,6 @@
 # WHD Client
 
-A Windows desktop client for [SolarWinds Web Help Desk](https://www.solarwinds.com/web-help-desk) (WHD) ticketing system, built with C# and WPF on .NET 9.
+A Windows desktop client for [SolarWinds Web Help Desk](https://www.solarwinds.com/web-help-desk) (WHD) ticketing system (tested with WHD 2026.1), built with C# and WPF on .NET 9.
 
 Designed to monitor incoming and assigned tickets, alert you when things change, and allows you work on tickets without touching the web UI.
 
@@ -79,7 +79,7 @@ The installer upgrades existing installations in place, so you do not need to un
 
 - Windows 10 (17763) or later
 - [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/9.0) (only if running without the installer; the MSI bundles what it needs)
-- A Web Help Desk instance (tested against WHD 12.x) and a **tech API key**
+- A Web Help Desk instance (tested against WHD 2026.1) and a **tech API key**
 
 
 ### Requires the .NET 9 SDK.
