@@ -25,6 +25,9 @@ public class Ticket
     [JsonPropertyName("room")] public string? Room { get; set; }
 
     [JsonPropertyName("statustype")] public StatusType? StatusType { get; set; }
+    // Statuses valid for this ticket's process — includes ones (e.g. approval-process
+    // statuses like "Approval Pending") that the global /StatusTypes list omits.
+    [JsonPropertyName("enabledStatusTypes")] public List<StatusType>? EnabledStatusTypes { get; set; }
     [JsonPropertyName("prioritytype")] public PriorityType? PriorityType { get; set; }
     [JsonPropertyName("problemtype")] public RequestType? ProblemType { get; set; }
     [JsonPropertyName("location")] public Location? Location { get; set; }

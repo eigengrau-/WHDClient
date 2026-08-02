@@ -138,6 +138,16 @@ public partial class TicketTabViewModel : TabViewModelBase
 
             await LoadLookupsAsync();
 
+            // Prefer the statuses valid for this ticket's process (enabledStatusTypes) — the
+            // global /StatusTypes list omits approval-process statuses like "Approval Pending".
+            if (ticket.EnabledStatusTypes?.Count > 0)
+            {
+                StatusTypes.Clear();
+                foreach (var s in ticket.EnabledStatusTypes) StatusTypes.Add(s);
+            }
+            if (ticket.StatusType != null && StatusTypes.All(s => s.Id != ticket.StatusType.Id))
+                StatusTypes.Add(ticket.StatusType);
+
             SelectedStatus = StatusTypes.FirstOrDefault(s => s.Id == ticket.StatusType?.Id);
             SelectedPriority = PriorityTypes.FirstOrDefault(p => p.Id == ticket.PriorityType?.Id);
             SelectedTech = Techs.FirstOrDefault(t => t.Id == ticket.ClientTech?.Id);
