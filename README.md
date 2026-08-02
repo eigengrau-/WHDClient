@@ -67,45 +67,28 @@ Taken in demo mode (`WHD_DEMO=1`): every name, location, and ticket is fabricate
 - **New Ticket**: Create tickets with cascading request-type selection, client lookup, priority/location/tech assignment, BBCode editor, and file attachments
 - **Bookmarks**: Pin tickets you keep coming back to
 
-## Requirements
+## Installation/Updates
+
+Download the latest MSI from the [releases page](https://github.com/eigengrau-/WHDClient/releases/latest) and run it.
+
+The installer upgrades existing installations in place, so you do not need to uninstall the old version first. Your settings, saved filters, and bookmarks are preserved.
+
+## Build from source
+
+### Requirements
 
 - Windows 10 (17763) or later
 - [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/9.0) (only if running without the installer; the MSI bundles what it needs)
 - A Web Help Desk instance (tested against WHD 12.x) and a **tech API key**
 
-## Getting a WHD API key
 
-In the WHD web UI, sign in as a tech and open your account setup page:
-
-```
-https://<your-whd-server>/helpdesk/WebObjects/Helpdesk.woa/wa/Nav?path=setup-techs-myaccount
-```
-
-Generate/copy the API key there, then paste it into the WHD Client sign-in window along with your WHD server URL.
-
-## Updating
-
-Download the latest MSI from the [releases page](https://github.com/eigengrau-/WHDClient/releases/latest) and run it. The installer upgrades the existing installation in place, so you do not need to uninstall the old version first. Your settings, saved filters, and bookmarks are preserved.
-
-The app also checks for new releases at startup and notifies you when one is available; you can trigger a check manually from the Settings page.
-
-## API key security
-
-WHD tech API keys grant full API access as that tech. Treat them like a password.
-
-- **At rest:** if you choose "remember me" at sign-in, the key is encrypted with Windows DPAPI (`ProtectedData`, `CurrentUser` scope) before being written to `%APPDATA%\WHDClient\settings.json`. It can only be decrypted by the same Windows user account on the same machine. The plaintext key is never written to disk.
-- **In transit:** the key is sent only to the WHD server URL you configured, over HTTPS, as the `apiKey` parameter on WHD REST API requests. It is never sent anywhere else and never written to logs.
-
-## Build from source
-
-Requires the .NET 9 SDK.
+### Requires the .NET 9 SDK.
 
 ```powershell
 dotnet build WHDClient.sln
 dotnet test WHDClient.sln          # core unit tests
 dotnet run --project src/WHDClient # launch the app
 ```
-
 ### Demo mode
 
 To try the app without a WHD server (or take screenshots without real data), set `WHD_DEMO=1`; the app then serves fabricated tickets, people, and lookups locally. Any server URL and API key are accepted, and nothing is read from or written to a real server or your real settings:
@@ -123,6 +106,22 @@ Requires [WiX Toolset](https://wixtoolset.org/) (`wix` .NET tool). Builds a self
 powershell -ExecutionPolicy Bypass -File installer/build-installer.ps1
 # output: installer/bin/Release/WHDClient-Setup.msi
 ```
+## Getting a WHD API key
+
+In the WHD web UI, sign in as a tech and open your account setup page:
+
+```
+https://<your-whd-server>/helpdesk/WebObjects/Helpdesk.woa/wa/Nav?path=setup-techs-myaccount
+```
+
+Generate/copy the API key there, then paste it into the WHD Client sign-in window along with your WHD server URL.
+
+### API key security
+
+WHD tech API keys grant full API access as that tech. Treat them like a password.
+
+- **At rest:** if you choose "remember me" at sign-in, the key is encrypted with Windows DPAPI (`ProtectedData`, `CurrentUser` scope) before being written to `%APPDATA%\WHDClient\settings.json`. It can only be decrypted by the same Windows user account on the same machine. The plaintext key is never written to disk.
+- **In transit:** the key is sent only to the WHD server URL you configured, over HTTPS, as the `apiKey` parameter on WHD REST API requests. It is never sent anywhere else and never written to logs.
 
 ## Project layout
 
