@@ -1,4 +1,5 @@
 using System.Windows;
+using WHDClient.Services;
 using WHDClient.ViewModels;
 
 namespace WHDClient.Views;
@@ -8,6 +9,7 @@ public partial class LoginWindow : Window
     public LoginWindow()
     {
         InitializeComponent();
+        DarkTitleBar.Apply(this);
         Loaded += (_, _) =>
         {
             // Pre-fill (masked) when a remembered key exists.

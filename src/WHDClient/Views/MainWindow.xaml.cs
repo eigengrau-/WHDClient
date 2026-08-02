@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using WHDClient.Services;
 using WHDClient.ViewModels;
 
 namespace WHDClient.Views;
@@ -10,6 +11,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        DarkTitleBar.Apply(this);
     }
 
     private void TicketNumberBox_KeyDown(object sender, KeyEventArgs e)
