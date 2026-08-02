@@ -107,7 +107,10 @@ public partial class TicketTabViewModel : TabViewModelBase
         ErrorMessage = null;
         try
         {
-            var ticket = await _session.Tickets.GetTicketAsync(TicketId);
+            // Ticket and notes are independent fetches — run them concurrently.
+            var ticketTask = _session.Tickets.GetTicketAsync(TicketId);
+            var notesTask = _session.Tickets.GetNotesAsync(TicketId);
+            var ticket = await ticketTask;
             if (ticket == null)
             {
                 ErrorMessage = $"Ticket {TicketId} not found.";
@@ -117,7 +120,7 @@ public partial class TicketTabViewModel : TabViewModelBase
             Header = $"#{ticket.Id} {Truncate(ticket.DisplaySubject, 30)}";
             HasDistinctDetail = ComputeHasDistinctDetail(ticket);
 
-            var notes = await _session.Tickets.GetNotesAsync(TicketId);
+            var notes = await notesTask;
             Notes.Clear();
             foreach (var n in notes.OrderByDescending(n => n.EffectiveDate))
                 Notes.Add(n);
