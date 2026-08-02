@@ -62,6 +62,7 @@ public class SettingsService
 
     public void Save()
     {
+        if (WhdSessionContext.IsDemoMode) return; // demo sessions never touch real settings
         Directory.CreateDirectory(Dir);
         File.WriteAllText(SettingsPath, JsonSerializer.Serialize(Settings, JsonOpts));
     }

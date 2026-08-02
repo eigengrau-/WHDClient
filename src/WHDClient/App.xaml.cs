@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using WHDClient.Core.Api;
 using WHDClient.Services;
 using WHDClient.ViewModels;
 using WHDClient.Views;
@@ -65,6 +66,18 @@ public partial class App : Application
             var settings = Services.GetRequiredService<SettingsService>();
             settings.Load();
             Log($"settings loaded; hasKey={settings.GetApiKey() != null}");
+
+            // Demo mode: replace anything user-specific in memory (Save is a no-op in demo).
+            if (WhdSessionContext.IsDemoMode)
+            {
+                settings.Settings.ServerUrl = DemoDataHandler.DemoServerUrl;
+                settings.Settings.BookmarkedTicketIds = new List<int> { 1001, 1003, 1008 };
+                settings.Settings.SavedFilters = new List<SavedFilter>
+                {
+                    new() { Name = "Chromebook repairs", Qualifier = "(problemType.id = 211)", AlertOnNew = true },
+                    new() { Name = "Urgent tickets", Qualifier = "(prioritytype.id = 4)", AlertOnNew = true },
+                };
+            }
 
             var loginVm = Services.GetRequiredService<LoginViewModel>();
             // With a remembered key, sign in silently and open the main window directly —

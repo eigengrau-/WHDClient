@@ -33,7 +33,7 @@ public partial class LoginViewModel : ObservableObject
     {
         _settings = settings;
         _session = session;
-        _serverUrl = settings.Settings.ServerUrl;
+        _serverUrl = WhdSessionContext.IsDemoMode ? DemoDataHandler.DemoServerUrl : settings.Settings.ServerUrl;
     }
 
     /// <summary>
@@ -80,10 +80,14 @@ public partial class LoginViewModel : ObservableObject
         {
             await _session.SignInAsync(ServerUrl.Trim(), ApiKey.Trim());
 
-            _settings.Settings.ServerUrl = ServerUrl.Trim();
-            if (RememberKey) _settings.SetApiKey(ApiKey.Trim());
-            else _settings.ClearApiKey();
-            _settings.Save();
+            // Demo mode must never overwrite the real saved URL/key.
+            if (!WhdSessionContext.IsDemoMode)
+            {
+                _settings.Settings.ServerUrl = ServerUrl.Trim();
+                if (RememberKey) _settings.SetApiKey(ApiKey.Trim());
+                else _settings.ClearApiKey();
+                _settings.Save();
+            }
 
             await Application.Current.Dispatcher.InvokeAsync(() =>
             {

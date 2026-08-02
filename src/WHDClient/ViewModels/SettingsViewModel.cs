@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WHDClient.Core.Api;
 using WHDClient.Services;
 
 namespace WHDClient.ViewModels;
@@ -21,7 +22,7 @@ public partial class SettingsViewModel : TabViewModelBase
         _updates = updates;
         _signOut = signOut;
 
-        ServerUrl = settings.Settings.ServerUrl;
+        ServerUrl = WhdSessionContext.IsDemoMode ? DemoDataHandler.DemoServerUrl : settings.Settings.ServerUrl;
         PollIntervalSeconds = settings.Settings.PollIntervalSeconds;
         PageSize = settings.Settings.PageSize;
         NotificationsEnabled = settings.Settings.NotificationsEnabled;
@@ -50,7 +51,10 @@ public partial class SettingsViewModel : TabViewModelBase
 
     public ObservableCollection<SavedFilter> AlertFilters => new(_settings.Settings.SavedFilters);
 
-    partial void OnServerUrlChanged(string value) => _settings.Settings.ServerUrl = value;
+    partial void OnServerUrlChanged(string value)
+    {
+        if (!WhdSessionContext.IsDemoMode) _settings.Settings.ServerUrl = value;
+    }
     partial void OnPollIntervalSecondsChanged(int value) => _settings.Settings.PollIntervalSeconds = value;
     partial void OnPageSizeChanged(int value) => _settings.Settings.PageSize = value;
 
@@ -78,6 +82,7 @@ public partial class SettingsViewModel : TabViewModelBase
     [RelayCommand]
     private void ForgetApiKey()
     {
+        if (WhdSessionContext.IsDemoMode) return; // never touch the real saved key in demo mode
         _settings.ClearApiKey();
         _settings.Save();
         HasRememberedKey = false;

@@ -22,6 +22,46 @@ Designed to monitor incoming and assigned tickets, alert you when things change,
 - **New Ticket**: Create tickets with cascading request-type selection, client lookup, priority/location/tech assignment, BBCode editor, and file attachments
 - **Bookmarks**: Pin tickets you keep coming back to
 
+## Screenshots
+
+Taken in demo mode (`WHD_DEMO=1`) — every name, school, and ticket is fabricated.
+
+**Sign in** — server URL + tech API key (masked, optionally remembered encrypted)
+
+![Sign in](docs/screenshots/login.png)
+
+**My Tickets** — tickets assigned to you, auto-refreshed, with colour-coded status/priority dots and column sorting
+
+![My Tickets](docs/screenshots/my-tickets.png)
+
+**Ticket detail** — BBCode-rendered request details, notes thread (newest first), attachments, reply editor with BBCode toolbar, bookmark and open-in-browser buttons
+
+![Ticket detail](docs/screenshots/ticket-detail.png)
+
+**Ticket Queue** — every open ticket across all tech groups, with pagination
+
+![Ticket Queue](docs/screenshots/queue.png)
+
+**Search** — field filters, cascading request type, raw advanced qualifier, and savable named filters
+
+![Search](docs/screenshots/search.png)
+
+**New Ticket** — cascading request types, client lookup, tech assignment, BBCode editor, attachments
+
+![New Ticket](docs/screenshots/new-ticket.png)
+
+**Bookmarks** — quick access to tickets you follow, with one-click removal
+
+![Bookmarks](docs/screenshots/bookmarks.png)
+
+**Notifications** — in-app feed plus Windows toasts for assignments, updates, filter matches, and app updates
+
+![Notifications](docs/screenshots/notifications.png)
+
+**Settings** — connection, polling, page size, notification alerts, and update checking
+
+![Settings](docs/screenshots/settings.png)
+
 ## Requirements
 
 - Windows 10 (17763) or later
@@ -40,7 +80,7 @@ Generate/copy the API key there, then paste it into the WHD Client sign-in windo
 
 ## API key security
 
-WHD tech API keys grant full API access as that tech. Ttreat them like a password.
+WHD tech API keys grant full API access as that tech. Treat them like a password.
 
 - **At rest:** if you choose "remember me" at sign-in, the key is encrypted with Windows DPAPI (`ProtectedData`, `CurrentUser` scope) before being written to `%APPDATA%\WHDClient\settings.json`. It can only be decrypted by the same Windows user account on the same machine. The plaintext key is never written to disk.
 - **In transit:** the key is sent only to the WHD server URL you configured, over HTTPS, as the `apiKey` parameter on WHD REST API requests. It is never sent anywhere else and never written to logs.
@@ -53,6 +93,15 @@ Requires the .NET 9 SDK.
 dotnet build WHDClient.sln
 dotnet test WHDClient.sln          # core unit tests
 dotnet run --project src/WHDClient # launch the app
+```
+
+### Demo mode
+
+To try the app without a WHD server (or take screenshots without real data), set `WHD_DEMO=1` — the app then serves fabricated tickets, people, and lookups locally. Any server URL and API key are accepted, and nothing is read from or written to a real server or your real settings:
+
+```powershell
+$env:WHD_DEMO = 1
+dotnet run --project src/WHDClient
 ```
 
 ### Installer (MSI)

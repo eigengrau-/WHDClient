@@ -213,8 +213,12 @@ public partial class MainViewModel : ObservableObject
     private void SignOut()
     {
         _polling.Stop();
-        _settings.ClearApiKey();
-        _settings.Save();
+        // Demo mode must never clear the real saved key.
+        if (!WhdSessionContext.IsDemoMode)
+        {
+            _settings.ClearApiKey();
+            _settings.Save();
+        }
         _session.SignOut();
 
         var login = new LoginWindow
