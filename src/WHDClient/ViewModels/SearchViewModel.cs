@@ -93,6 +93,14 @@ public partial class SearchViewModel : TicketListViewModelBase
         return tickets;
     }
 
+    protected override Task<int> CountAsync(CancellationToken ct)
+    {
+        // Ticket-number searches return at most one ticket — no server counting needed.
+        if (string.IsNullOrEmpty(EffectiveQualifier()) || int.TryParse(TicketNumber.Trim(), out _))
+            return Task.FromResult(Tickets.Count);
+        return Session.Tickets.CountSearchAsync(EffectiveQualifier(), ct);
+    }
+
     private string EffectiveQualifier()
     {
         if (!string.IsNullOrWhiteSpace(QualifierText))
@@ -131,6 +139,7 @@ public partial class SearchViewModel : TicketListViewModelBase
     private async Task SearchAsync()
     {
         Page = 1;
+        TotalCount = null; // stale once the criteria change
         await RefreshAsync();
     }
 
@@ -160,6 +169,7 @@ public partial class SearchViewModel : TicketListViewModelBase
         if (filter == null) return;
         QualifierText = filter.Qualifier;
         Page = 1;
+        TotalCount = null;
         _ = RefreshAsync();
     }
 

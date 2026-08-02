@@ -22,4 +22,7 @@ public class MyTicketsViewModel : TicketListViewModelBase
 
     protected override Task<List<Ticket>> FetchAsync(int page, CancellationToken ct)
         => Session.Tickets.GetTicketsAsync(TicketListKind.Mine, page: page, limit: PageSize, ct: ct);
+
+    protected override Task<int> CountAsync(CancellationToken ct)
+        => Session.Tickets.CountTicketsAsync(TicketListKind.Mine, ct: ct);
 }

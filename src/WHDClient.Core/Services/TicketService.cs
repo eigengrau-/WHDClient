@@ -49,6 +49,36 @@ public class TicketService
         return _api.GetListAsync<Ticket>("/Tickets", q, ct);
     }
 
+    /// <summary>
+    /// Counts all matches for a list endpoint by paging short-style results (WHD caps limit at
+    /// 100). Costs ~1-3s of server time per 100 matches — call on demand, never per auto-refresh.
+    /// </summary>
+    public Task<int> CountTicketsAsync(TicketListKind kind, string? qualifier = null, CancellationToken ct = default)
+        => CountPagedAsync(ListPath(kind), qualifier, ct);
+
+    /// <summary>Counts all matches for a search qualifier. See <see cref="CountTicketsAsync"/> for the cost caveat.</summary>
+    public Task<int> CountSearchAsync(string qualifier, CancellationToken ct = default)
+        => CountPagedAsync("/Tickets", qualifier, ct);
+
+    private async Task<int> CountPagedAsync(string path, string? qualifier, CancellationToken ct)
+    {
+        const int pageLimit = 100; // WHD silently caps limit at 100 for ticket lists.
+        var total = 0;
+        for (var page = 1; page <= 50; page++) // safety cap: 5000 tickets
+        {
+            var q = new Dictionary<string, string?>
+            {
+                ["page"] = page.ToString(),
+                ["limit"] = pageLimit.ToString(),
+                ["qualifier"] = qualifier
+            };
+            var batch = await _api.GetListAsync<Ticket>(path, q, ct);
+            total += batch.Count;
+            if (batch.Count < pageLimit) break;
+        }
+        return total;
+    }
+
     public Task<Ticket?> GetTicketAsync(int id, bool details = true, CancellationToken ct = default)
     {
         var q = details ? new Dictionary<string, string?> { ["style"] = "details", ["withTUC"] = "true" } : null;

@@ -34,6 +34,12 @@ public class QueueViewModel : TicketListViewModelBase
         return await Session.Tickets.SearchTicketsAsync(_openQualifier, page: page, limit: PageSize, ct: ct);
     }
 
+    protected override async Task<int> CountAsync(CancellationToken ct)
+    {
+        _openQualifier ??= await BuildOpenQualifierAsync(ct);
+        return await Session.Tickets.CountSearchAsync(_openQualifier, ct);
+    }
+
     private async Task<string> BuildOpenQualifierAsync(CancellationToken ct)
     {
         var closedIds = await Session.Lookups.GetClosedStatusIdsAsync(ct);

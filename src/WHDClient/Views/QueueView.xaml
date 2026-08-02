@@ -66,6 +66,9 @@
                 <Button Content="Prev" Command="{Binding PreviousPageCommand}" IsEnabled="{Binding CanGoPrevious}" Padding="10,2"/>
                 <TextBlock Text="{Binding PageText}" Style="{StaticResource DimText}" VerticalAlignment="Center" Margin="10,0"/>
                 <Button Content="Next" Command="{Binding NextPageCommand}" IsEnabled="{Binding HasNextPage}" Padding="10,2"/>
+                <TextBlock Text="{Binding CountText}" Style="{StaticResource DimText}" VerticalAlignment="Center" Margin="10,0"/>
+                <Button Content="Count" Command="{Binding CountTotalCommand}" IsEnabled="{Binding IsNotCounting}" Padding="10,2"
+                        ToolTip="Count all matching tickets (pages the server; can take a few seconds)"/>
             </StackPanel>
             <StackPanel>
                 <ProgressBar IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisConverter}}"/>

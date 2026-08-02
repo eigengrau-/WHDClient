@@ -29,6 +29,10 @@ public partial class BookmarksViewModel : TicketListViewModelBase
         return result;
     }
 
+    /// <summary>Bookmarks live in local settings — counting them is free.</summary>
+    protected override Task<int> CountAsync(CancellationToken ct)
+        => Task.FromResult(Settings.Settings.BookmarkedTicketIds.Count);
+
     [RelayCommand]
     private void RemoveBookmark(TicketRow? row)
     {

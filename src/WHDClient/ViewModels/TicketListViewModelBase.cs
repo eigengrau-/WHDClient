@@ -71,6 +71,19 @@ public abstract partial class TicketListViewModelBase : TabViewModelBase
     [ObservableProperty]
     private bool _hasNextPage;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CountText))]
+    private int? _totalCount;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotCounting))]
+    private bool _isCounting;
+
+    public bool IsNotCounting => !IsCounting;
+
+    /// <summary>"25 shown", or "Showing 25 of 342" once the user has requested a total.</summary>
+    public string CountText => TotalCount is int n ? $"Showing {Tickets.Count} of {n}" : $"{Tickets.Count} shown";
+
     public bool CanGoPrevious => Page > 1;
     public string PageText => $"Page {Page}";
 
@@ -82,6 +95,9 @@ public abstract partial class TicketListViewModelBase : TabViewModelBase
     }
 
     protected abstract Task<List<Ticket>> FetchAsync(int page, CancellationToken ct);
+
+    /// <summary>Counts every match for the current query — potentially several server round-trips.</summary>
+    protected abstract Task<int> CountAsync(CancellationToken ct);
 
     [RelayCommand]
     public async Task RefreshAsync()
@@ -107,6 +123,7 @@ public abstract partial class TicketListViewModelBase : TabViewModelBase
                 Tickets.Add(row);
             }
             LastRefreshText = DateTime.Now.ToString("HH:mm:ss");
+            OnPropertyChanged(nameof(CountText));
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
@@ -116,6 +133,29 @@ public abstract partial class TicketListViewModelBase : TabViewModelBase
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    /// <summary>
+    /// On-demand total match count. The API returns no totals, so this pages through short-style
+    /// results (~1-3s of server time per 100 matches) — hence a button, not an automatic count.
+    /// </summary>
+    [RelayCommand]
+    private async Task CountTotalAsync()
+    {
+        if (IsCounting || IsBusy || !Session.IsSignedIn) return;
+        IsCounting = true;
+        try
+        {
+            TotalCount = await CountAsync(default);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            IsCounting = false;
         }
     }
 
