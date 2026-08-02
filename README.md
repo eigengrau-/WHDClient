@@ -4,6 +4,8 @@ A Windows desktop client for [SolarWinds Web Help Desk](https://www.solarwinds.c
 
 Designed to monitor incoming and assigned tickets, alert you when things change, and allows you work on tickets without touching the web UI.
 
+**[Download the latest MSI installer here!](https://github.com/eigengrau-/WHDClient/releases/latest)**
+
 ## Features
 
 - **Ticket tabs**: Open multiple tickets side by side; reply with notes, change status/priority, add attachments, open in browser
@@ -19,10 +21,6 @@ Designed to monitor incoming and assigned tickets, alert you when things change,
 - **Search**: Full ticket search plus a raw advanced-qualifier box; searches can be saved as named filters
 - **New Ticket**: Create tickets with cascading request-type selection, client lookup, priority/location/tech assignment, BBCode editor, and file attachments
 - **Bookmarks**: Pin tickets you keep coming back to
-
-## Install
-
-[Click here to download the installer](https://github.com/eigengrau-/WHDClient/releases/download/v1.0.0/WHDClient-Setup.msi)
 
 ## Requirements
 
