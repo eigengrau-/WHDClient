@@ -73,6 +73,24 @@ Download the latest MSI from the [releases page](https://github.com/eigengrau-/W
 
 The installer upgrades existing installations in place, so you do not need to uninstall the old version first. Your settings, saved filters, and bookmarks are preserved.
 
+## Getting a WHD API key
+
+In the WHD web UI, sign in as a tech and open your account setup page:
+
+```
+https://<your-whd-server>/helpdesk/WebObjects/Helpdesk.woa/wa/Nav?path=setup-techs-myaccount
+```
+
+Generate/copy the API key there, then paste it into the WHD Client sign-in window along with your WHD server URL.
+
+### API key security
+
+WHD tech API keys grant full API access as that tech. Treat them like a password.
+
+- **At rest:** if you choose "remember me" at sign-in, the key is encrypted with Windows DPAPI (`ProtectedData`, `CurrentUser` scope) before being written to `%APPDATA%\WHDClient\settings.json`. It can only be decrypted by the same Windows user account on the same machine. The plaintext key is never written to disk.
+- **In transit:** the key is sent only to the WHD server URL you configured, over HTTPS, as the `apiKey` parameter on WHD REST API requests. It is never sent anywhere else and never written to logs.
+
+
 ## Build from source
 
 ### Requirements
@@ -106,22 +124,6 @@ Requires [WiX Toolset](https://wixtoolset.org/) (`wix` .NET tool). Builds a self
 powershell -ExecutionPolicy Bypass -File installer/build-installer.ps1
 # output: installer/bin/Release/WHDClient-Setup.msi
 ```
-## Getting a WHD API key
-
-In the WHD web UI, sign in as a tech and open your account setup page:
-
-```
-https://<your-whd-server>/helpdesk/WebObjects/Helpdesk.woa/wa/Nav?path=setup-techs-myaccount
-```
-
-Generate/copy the API key there, then paste it into the WHD Client sign-in window along with your WHD server URL.
-
-### API key security
-
-WHD tech API keys grant full API access as that tech. Treat them like a password.
-
-- **At rest:** if you choose "remember me" at sign-in, the key is encrypted with Windows DPAPI (`ProtectedData`, `CurrentUser` scope) before being written to `%APPDATA%\WHDClient\settings.json`. It can only be decrypted by the same Windows user account on the same machine. The plaintext key is never written to disk.
-- **In transit:** the key is sent only to the WHD server URL you configured, over HTTPS, as the `apiKey` parameter on WHD REST API requests. It is never sent anywhere else and never written to logs.
 
 ## Project layout
 
