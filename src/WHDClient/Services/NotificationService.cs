@@ -80,7 +80,7 @@ public partial class NotificationService : ObservableObject
         });
 
         if (_settings.Settings.NotificationsEnabled)
-            ShowToast(notification.Title, notification.Message);
+            ShowToast(notification.Title, notification.Message, notification.Url);
     }
 
     private (string Title, string Message) Describe(TicketChange c) => c.Kind switch
@@ -94,14 +94,18 @@ public partial class NotificationService : ObservableObject
         _ => ("Ticket change", $"#{c.TicketId}: {c.Subject}")
     };
 
-    private static void ShowToast(string title, string message)
+    private static void ShowToast(string title, string message, string? url = null)
     {
         try
         {
-            new ToastContentBuilder()
+            var builder = new ToastContentBuilder()
                 .AddText(title)
-                .AddText(message)
-                .Show();
+                .AddText(message);
+            // Clicking the toast fires ToastNotificationManagerCompat.OnActivated (App.OnStartup)
+            // with these arguments; "url" means "open this link in the browser".
+            if (!string.IsNullOrEmpty(url))
+                builder.AddArgument("url", url);
+            builder.Show();
         }
         catch
         {

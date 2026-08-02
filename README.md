@@ -83,6 +83,12 @@ https://<your-whd-server>/helpdesk/WebObjects/Helpdesk.woa/wa/Nav?path=setup-tec
 
 Generate/copy the API key there, then paste it into the WHD Client sign-in window along with your WHD server URL.
 
+## Updating
+
+Download the latest MSI from the [releases page](https://github.com/eigengrau-/WHDClient/releases/latest) and run it. The installer upgrades the existing installation in place, so you do not need to uninstall the old version first. Your settings, saved filters, and bookmarks are preserved.
+
+The app also checks for new releases at startup and notifies you when one is available; you can trigger a check manually from the Settings page.
+
 ## API key security
 
 WHD tech API keys grant full API access as that tech. Treat them like a password.

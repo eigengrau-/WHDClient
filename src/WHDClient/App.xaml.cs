@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Toolkit.Uwp.Notifications;
 using WHDClient.Core.Api;
 using WHDClient.Services;
 using WHDClient.ViewModels;
@@ -49,6 +51,23 @@ public partial class App : Application
 
         base.OnStartup(e);
         Log("base.OnStartup done");
+
+        // Toast click activation: toasts carrying a "url" argument (e.g. update available)
+        // open that link in the default browser. Must be registered before any toast is shown.
+        ToastNotificationManagerCompat.OnActivated += toastArgs =>
+        {
+            try
+            {
+                Log($"toast activated: {toastArgs.Argument}");
+                var args = ToastArguments.Parse(toastArgs.Argument);
+                if (args.TryGetValue("url", out var url) && !string.IsNullOrWhiteSpace(url))
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                Log($"toast activation failed: {ex.Message}");
+            }
+        };
 
         try
         {
