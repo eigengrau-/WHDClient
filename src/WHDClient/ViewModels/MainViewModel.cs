@@ -203,6 +203,9 @@ public partial class MainViewModel : ObservableObject
             if (target is BookmarksViewModel b) _ = b.RefreshAsync();
         }
         SelectedTab = target;
+        // The Updates section refreshes itself whenever the Settings page is opened
+        // (the command no-ops while a check is already running).
+        if (target is SettingsViewModel s) s.CheckForUpdatesCommand.Execute(null);
     }
 
     /// <summary>Index after the last page tab; ticket tabs always open at or after this index.</summary>
