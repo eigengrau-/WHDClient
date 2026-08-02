@@ -11,6 +11,8 @@ public class AppNotification
     public required string Title { get; init; }
     public required string Message { get; init; }
     public int? TicketId { get; init; }
+    /// <summary>When set, clicking the notification opens this URL (e.g. an update download) instead of a ticket.</summary>
+    public string? Url { get; init; }
     public DateTimeOffset Timestamp { get; init; } = DateTimeOffset.Now;
     public string TimeDisplay => Timestamp.ToLocalTime().ToString("HH:mm:ss");
 }
@@ -54,8 +56,31 @@ public partial class NotificationService : ObservableObject
             });
 
             if (_settings.Settings.NotificationsEnabled)
-                ShowToast(title, message, change.TicketId);
+                ShowToast(title, message);
         }
+    }
+
+    /// <summary>Alerts the user that a newer app version is available (in-app feed + toast).</summary>
+    public void NotifyUpdateAvailable(UpdateInfo update)
+    {
+        var notification = new AppNotification
+        {
+            Title = "Update available",
+            Message = $"WHD Client v{update.Version} is available — click to download.",
+            Url = update.Url
+        };
+
+        Application.Current?.Dispatcher.Invoke(() =>
+        {
+            // Replace any earlier update notification rather than stacking them.
+            for (int i = Notifications.Count - 1; i >= 0; i--)
+                if (Notifications[i].Url != null) Notifications.RemoveAt(i);
+            Notifications.Insert(0, notification);
+            UnreadCount++;
+        });
+
+        if (_settings.Settings.NotificationsEnabled)
+            ShowToast(notification.Title, notification.Message);
     }
 
     private (string Title, string Message) Describe(TicketChange c) => c.Kind switch
@@ -69,7 +94,7 @@ public partial class NotificationService : ObservableObject
         _ => ("Ticket change", $"#{c.TicketId}: {c.Subject}")
     };
 
-    private static void ShowToast(string title, string message, int ticketId)
+    private static void ShowToast(string title, string message)
     {
         try
         {

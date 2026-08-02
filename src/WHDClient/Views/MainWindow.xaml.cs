@@ -3,7 +3,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using WHDClient.Services;
 using WHDClient.ViewModels;
-
 namespace WHDClient.Views;
 
 public partial class MainWindow : Window
@@ -25,11 +24,14 @@ public partial class MainWindow : Window
 
     private void Notification_Click(object sender, MouseButtonEventArgs e)
     {
-        if (sender is FrameworkElement el && el.Tag is int ticketId && DataContext is MainViewModel vm)
+        if (sender is FrameworkElement el && el.Tag is AppNotification notification && DataContext is MainViewModel vm)
         {
             vm.Notifications.MarkAllRead();
-            vm.OpenTicket(ticketId);
             NotifyToggle.IsChecked = false;
+            if (notification.Url != null)
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(notification.Url) { UseShellExecute = true });
+            else if (notification.TicketId is int ticketId)
+                vm.OpenTicket(ticketId);
         }
     }
 }

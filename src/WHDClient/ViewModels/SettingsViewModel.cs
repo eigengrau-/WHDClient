@@ -8,15 +8,17 @@ namespace WHDClient.ViewModels;
 public partial class SettingsViewModel : TabViewModelBase
 {
     private readonly SettingsService _settings;
+    private readonly UpdateService _updates;
     private readonly Action _signOut;
 
     public override bool IsClosable => true;
 
-    public SettingsViewModel(SettingsService settings, WhdSessionContext session, Action signOut)
+    public SettingsViewModel(SettingsService settings, WhdSessionContext session, UpdateService updates, Action signOut)
     {
         Header = "Settings";
         IconSource = "pack://application:,,,/Assets/icons/settings.png";
         _settings = settings;
+        _updates = updates;
         _signOut = signOut;
 
         ServerUrl = settings.Settings.ServerUrl;
@@ -40,6 +42,11 @@ public partial class SettingsViewModel : TabViewModelBase
     [ObservableProperty] private bool _hasRememberedKey;
     [ObservableProperty] private string _currentUserText = "";
     [ObservableProperty] private string _savedMessage = "";
+    [ObservableProperty] private string _updateStatus = "";
+    [ObservableProperty] private string? _updateUrl;
+    [ObservableProperty] private bool _updateCheckInProgress;
+
+    public string CurrentVersionText => $"Version {UpdateService.CurrentVersion}";
 
     public ObservableCollection<SavedFilter> AlertFilters => new(_settings.Settings.SavedFilters);
 
@@ -74,6 +81,43 @@ public partial class SettingsViewModel : TabViewModelBase
         _settings.ClearApiKey();
         _settings.Save();
         HasRememberedKey = false;
+    }
+
+    [RelayCommand]
+    private async Task CheckForUpdatesAsync()
+    {
+        if (UpdateCheckInProgress) return;
+        UpdateCheckInProgress = true;
+        UpdateStatus = "Checking for updates…";
+        UpdateUrl = null;
+        try
+        {
+            var (update, succeeded) = await _updates.CheckForUpdateAsync();
+            if (!succeeded)
+            {
+                UpdateStatus = "Update check failed — GitHub unreachable.";
+            }
+            else if (update != null)
+            {
+                UpdateStatus = $"Version {update.Version} is available.";
+                UpdateUrl = update.Url;
+            }
+            else
+            {
+                UpdateStatus = "You're up to date.";
+            }
+        }
+        finally
+        {
+            UpdateCheckInProgress = false;
+        }
+    }
+
+    [RelayCommand]
+    private void OpenUpdateDownload()
+    {
+        if (UpdateUrl != null)
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(UpdateUrl) { UseShellExecute = true });
     }
 
     [RelayCommand]

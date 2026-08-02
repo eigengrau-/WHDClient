@@ -137,10 +137,12 @@
                                             <DataTemplate>
                                                 <Border BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="0,0,0,1"
                                                         Padding="2,6" MouseLeftButtonUp="Notification_Click" Cursor="Hand"
-                                                        Tag="{Binding TicketId}">
+                                                        Tag="{Binding}">
                                                     <StackPanel>
                                                         <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource HeaderBrush}"/>
                                                         <TextBlock Text="{Binding Message}" FontSize="12"/>
+                                                        <TextBlock Text="Open download page" FontSize="12" Foreground="{StaticResource LinkBrush}"
+                                                                   Visibility="{Binding Url, Converter={StaticResource NullToVisConverter}}"/>
                                                         <TextBlock Text="{Binding TimeDisplay}" Style="{StaticResource DimText}"/>
                                                     </StackPanel>
                                                 </Border>

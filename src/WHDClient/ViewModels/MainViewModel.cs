@@ -31,6 +31,7 @@ public partial class MainViewModel : ObservableObject
     private readonly SettingsService _settings;
     private readonly PollingService _polling;
     private readonly NotificationService _notifications;
+    private readonly UpdateService _updates;
 
     public ObservableCollection<TabViewModelBase> Tabs { get; } = new();
 
@@ -50,12 +51,13 @@ public partial class MainViewModel : ObservableObject
     private BookmarksViewModel? _bookmarks;
 
     public MainViewModel(WhdSessionContext session, SettingsService settings,
-        PollingService polling, NotificationService notifications)
+        PollingService polling, NotificationService notifications, UpdateService updates)
     {
         _session = session;
         _settings = settings;
         _polling = polling;
         _notifications = notifications;
+        _updates = updates;
 
         // Only My Tickets is a permanent tab; the other pages open on demand from the sidebar.
         _myTickets = new MyTicketsViewModel(_session, _settings, OpenTicket);
@@ -70,6 +72,9 @@ public partial class MainViewModel : ObservableObject
 
         StatusText = $"Connected to {_session.ServerUrl}";
 
+        // Silent update check on startup; alerts via the notification feed when newer exists.
+        _ = CheckForUpdatesAsync();
+
         // Dev/test hook: WHD_START_PAGE=mine|search|queue|settings|newticket|ticket:<id>
         var startPage = Environment.GetEnvironmentVariable("WHD_START_PAGE");
         if (!string.IsNullOrEmpty(startPage))
@@ -82,6 +87,13 @@ public partial class MainViewModel : ObservableObject
             else
                 ShowPageCommand.Execute(startPage.ToLowerInvariant());
         }
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        var (update, _) = await _updates.CheckForUpdateAsync();
+        if (update != null)
+            _notifications.NotifyUpdateAvailable(update);
     }
 
     private void OnChangesDetected(object? sender, IReadOnlyList<TicketChange> changes)
@@ -176,7 +188,7 @@ public partial class MainViewModel : ObservableObject
             "mine" => _myTickets,
             "search" => _search ??= new SearchViewModel(_session, _settings, OpenTicket),
             "queue" => _queue ??= new QueueViewModel(_session, _settings, OpenTicket),
-            "settings" => _settingsPage ??= new SettingsViewModel(_settings, _session, SignOut),
+            "settings" => _settingsPage ??= new SettingsViewModel(_settings, _session, _updates, SignOut),
             "bookmarks" => _bookmarks ??= new BookmarksViewModel(_session, _settings, OpenTicket),
             _ => null
         };

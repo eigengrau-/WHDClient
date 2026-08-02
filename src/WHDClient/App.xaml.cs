@@ -56,6 +56,7 @@ public partial class App : Application
             services.AddSingleton<WhdSessionContext>();
             services.AddSingleton<PollingService>();
             services.AddSingleton<NotificationService>();
+            services.AddSingleton<UpdateService>();
             services.AddSingleton<MainViewModel>();
             services.AddTransient<LoginViewModel>();
             Services = services.BuildServiceProvider();
