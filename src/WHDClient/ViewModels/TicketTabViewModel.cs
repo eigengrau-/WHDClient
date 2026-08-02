@@ -292,12 +292,15 @@ public partial class TicketTabViewModel : TabViewModelBase
         IsSearchingCc = true;
         try
         {
-            var techs = await _session.Lookups.GetTechsAsync(fragment);
+            // The /Techs endpoint ignores name qualifiers (returns the whole list,
+            // including inactive accounts), so use the cached tech list and filter here.
+            var techs = await _session.Lookups.GetTechsAsync();
             var clients = await _session.Lookups.SearchClientsAsync(fragment);
             CcResults.Clear();
-            foreach (var t in techs.Where(t => !string.IsNullOrEmpty(t.Email)))
+            foreach (var t in techs.Where(t => t.IsSelectable && !string.IsNullOrEmpty(t.Email) && MatchesFragment(t, fragment)))
                 CcResults.Add(new CcRecipient { Email = t.Email!, Name = t.DisplayName, Kind = "Tech" });
-            foreach (var c in clients.Where(c => !string.IsNullOrEmpty(c.Email)))
+            foreach (var c in clients.Where(c => !string.IsNullOrEmpty(c.Email)
+                     && CcResults.All(r => !r.Email.Equals(c.Email, StringComparison.OrdinalIgnoreCase))))
                 CcResults.Add(new CcRecipient { Email = c.Email!, Name = c.DisplayName, Kind = "Client" });
         }
         catch (Exception ex)
@@ -310,6 +313,12 @@ public partial class TicketTabViewModel : TabViewModelBase
             CcSearchCompleted?.Invoke();
         }
     }
+
+    private static bool MatchesFragment(Tech t, string fragment) =>
+        (t.FirstName?.Contains(fragment, StringComparison.OrdinalIgnoreCase) ?? false) ||
+        (t.LastName?.Contains(fragment, StringComparison.OrdinalIgnoreCase) ?? false) ||
+        (t.ServerDisplayName?.Contains(fragment, StringComparison.OrdinalIgnoreCase) ?? false) ||
+        (t.Email?.Contains(fragment, StringComparison.OrdinalIgnoreCase) ?? false);
 
     [RelayCommand]
     private void RemoveCcRecipient(CcRecipient? recipient)
