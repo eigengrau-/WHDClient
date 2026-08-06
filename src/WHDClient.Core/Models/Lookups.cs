@@ -33,6 +33,10 @@ public class Tech
     /// <summary>Inactive/deleted techs stay on old tickets but must not be assignable.</summary>
     [JsonIgnore]
     public bool IsSelectable => !Inactive && !Deleted;
+
+    /// <summary>Search sentinel for "Not Assigned" (tickets with no tech). Not a real tech.</summary>
+    [JsonIgnore]
+    public static Tech NotAssigned { get; } = new() { Id = -1, ServerDisplayName = "Not Assigned" };
 }
 
 public class Client

@@ -60,7 +60,9 @@ public partial class SearchViewModel : TicketListViewModelBase
             foreach (var p in await Session.Lookups.GetPriorityTypesAsync()) PriorityTypes.Add(p);
             Locations.Add(null);
             foreach (var l in await Session.Lookups.GetLocationsAsync()) Locations.Add(l);
+            // "(any)", then "Not Assigned", then the real techs.
             Techs.Add(null);
+            Techs.Add(Tech.NotAssigned);
             foreach (var t in await Session.Lookups.GetActiveTechsAsync()) Techs.Add(t);
             RequestTypePicker.SetRequestTypes(await Session.Lookups.GetSelectableRequestTypesAsync());
         }
@@ -117,7 +119,9 @@ public partial class SearchViewModel : TicketListViewModelBase
             clauses.Add(QualifierBuilder.Clause("priorityTypeId", QualifierBuilder.Op.Eq, SelectedPriority.Id.ToString(), false));
         if (SelectedLocation != null)
             clauses.Add(QualifierBuilder.Clause("locationId", QualifierBuilder.Op.Eq, SelectedLocation.Id.ToString(), false));
-        if (SelectedTech != null)
+        if (ReferenceEquals(SelectedTech, Tech.NotAssigned))
+            clauses.Add("(clientTech = null)");
+        else if (SelectedTech != null)
             clauses.Add(QualifierBuilder.Clause("clientTech.clientId", QualifierBuilder.Op.Eq, SelectedTech.Id.ToString(), false));
         if (RequestTypePicker.SelectedRequestType != null)
             clauses.Add(QualifierBuilder.Clause("problemTypeId", QualifierBuilder.Op.Eq, RequestTypePicker.SelectedRequestType.Id.ToString(), false));

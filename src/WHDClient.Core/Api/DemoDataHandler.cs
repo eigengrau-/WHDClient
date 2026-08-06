@@ -187,7 +187,7 @@ internal static class DemoData
 
     private record TicketSeed(
         int Id, string Subject, int Status, int Priority, int Location, int ReqType,
-        int Client, int Tech, double AgeDays, double UpdatedHours, string? Room = null);
+        int Client, int? Tech, double AgeDays, double UpdatedHours, string? Room = null);
 
     private static readonly TicketSeed[] Seeds =
     {
@@ -218,7 +218,7 @@ internal static class DemoData
         new(1025, "Report card system access", 1, 3, 11, 121, 105, 1, 0.5, 2),
         new(1026, "Security camera NVR storage alert", 1, 4, 12, 200, 106, 2, 0.8, 3),
         new(1027, "Staff IT onboarding session", 4, 1, 14, 121, 107, 1, 12.0, 300),
-        new(1028, "Chromebook — cracked screen", 1, 2, 13, 211, 108, 2, 1.6, 9),
+        new(1028, "Chromebook — cracked screen", 1, 2, 13, 211, 108, null, 1.6, 9),
     };
 
     public static readonly List<Ticket> All = Seeds.Select(s => BuildTicket(s)).ToList();
@@ -231,7 +231,7 @@ internal static class DemoData
         var location = Locations.First(x => x.Id == s.Location);
         var reqType = RequestTypes.First(x => x.Id == s.ReqType);
         var client = Clients.First(x => Equals(x.Id, s.Client));
-        var tech = Techs.First(x => x.Id == s.Tech);
+        var tech = s.Tech == null ? null : Techs.First(x => x.Id == s.Tech);
         var reported = Now.AddDays(-s.AgeDays);
         var updated = Now.AddHours(-s.UpdatedHours);
 
@@ -358,6 +358,8 @@ internal static class DemoData
     public static List<Ticket> Search(string? qualifier)
     {
         if (string.IsNullOrEmpty(qualifier)) return All;
+        if (Regex.IsMatch(qualifier, @"clientTech\s*=\s*null"))
+            return All.Where(t => t.ClientTech == null).ToList();
         var m = Regex.Match(qualifier, @"problemType\.id\s*=\s*(\d+)");
         if (m.Success) return All.Where(t => t.ProblemType?.Id == int.Parse(m.Groups[1].Value)).ToList();
         m = Regex.Match(qualifier, @"prioritytype\.id\s*=\s*(\d+)", RegexOptions.IgnoreCase);
