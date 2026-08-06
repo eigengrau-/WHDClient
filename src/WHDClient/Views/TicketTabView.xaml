@@ -81,7 +81,8 @@
                 <Border BorderBrush="{DynamicResource HeaderBrush}" BorderThickness="3,0,0,0"
                         Background="{DynamicResource Panel2Brush}" Padding="10,6" Margin="0,8,0,0"
                         Visibility="{Binding HasDistinctDetail, Converter={StaticResource BoolToVisConverter}}">
-                    <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto"
+                                  beh:ScrollWheelSpeed.PixelsPerNotch="24">
                         <RichTextBox beh:BbCode.Text="{Binding Ticket.DisplayDetail, Mode=OneWay}"
                                      Style="{DynamicResource SelectableRichText}"
                                      FontSize="{DynamicResource FontSize12}"/>
@@ -143,7 +144,8 @@
                 </Grid.RowDefinitions>
 
                 <!-- Notes timeline -->
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,10,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,10,0"
+                              beh:ScrollWheelSpeed.PixelsPerNotch="24">
                     <ItemsControl ItemsSource="{Binding Notes}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>

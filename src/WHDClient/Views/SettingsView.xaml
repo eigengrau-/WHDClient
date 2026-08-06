@@ -1,74 +1,81 @@
 <UserControl x:Class="WHDClient.Views.SettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="16" MaxWidth="640" HorizontalAlignment="Left">
-            <TextBlock Text="Settings" Style="{DynamicResource HeaderText}" Margin="0,0,0,10"/>
-
-            <TextBlock Text="{Binding CurrentUserText}" Style="{DynamicResource DimText}" Margin="0,0,0,10"/>
-
-            <TextBlock Text="Connection" Style="{DynamicResource SubHeaderText}"/>
-            <TextBlock Text="Server URL" Style="{DynamicResource DimText}" Margin="0,6,0,2"/>
-            <TextBox Text="{Binding ServerUrl, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Text="Poll interval (seconds, min 15)" Style="{DynamicResource DimText}" Margin="0,8,0,2"/>
-            <TextBox Text="{Binding PollIntervalSeconds, UpdateSourceTrigger=PropertyChanged}" Width="80" HorizontalAlignment="Left"/>
-            <TextBlock Text="Tickets per page (smaller pages load faster)" Style="{DynamicResource DimText}" Margin="0,8,0,2"/>
-            <ComboBox ItemsSource="{Binding PageSizeOptions}" SelectedItem="{Binding PageSize}"
-                      Width="80" HorizontalAlignment="Left"/>
-
-            <Separator/>
-            <TextBlock Text="Notifications" Style="{DynamicResource SubHeaderText}"/>
-            <CheckBox Content="Enable Windows toast notifications" IsChecked="{Binding NotificationsEnabled}" Margin="0,6,0,0"/>
-            <CheckBox Content="When a ticket is assigned to me" IsChecked="{Binding NotifyAssignedToMe}"/>
-            <CheckBox Content="When one of my tickets is updated" IsChecked="{Binding NotifyMyTicketUpdated}"/>
-            <CheckBox Content="When a new ticket matches an alert filter" IsChecked="{Binding NotifyNewMatching}"/>
-
-            <TextBlock Text="Alert filters (saved filters that trigger notifications on new matches)"
-                       Style="{DynamicResource DimText}" Margin="0,10,0,4"/>
-            <ItemsControl ItemsSource="{Binding AlertFilters}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <DockPanel Margin="0,1">
-                            <CheckBox IsChecked="{Binding AlertOnNew}"
-                                      Click="AlertFilter_Click" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="6,0,0,0"/>
-                        </DockPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <TextBlock Text="Create filters on the Search page, then enable alerts here."
-                       Style="{DynamicResource DimText}" Margin="0,4,0,0"/>
-
-            <Separator/>
-            <TextBlock Text="Updates" Style="{DynamicResource SubHeaderText}"/>
-            <TextBlock Text="{Binding CurrentVersionText}" Style="{DynamicResource DimText}" Margin="0,6,0,2"/>
-            <TextBlock Text="{Binding UpdateStatus}" Style="{DynamicResource DimText}" Margin="0,4,0,0"/>
-            <Button Content="Download update" Command="{Binding OpenUpdateDownloadCommand}"
-                    HorizontalAlignment="Left" Margin="0,6,0,0"
-                    Visibility="{Binding UpdateUrl, Converter={StaticResource NullToVisConverter}}"/>
-
-            <Separator/>
-            <TextBlock Text="Sign-in" Style="{DynamicResource SubHeaderText}"/>
-            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                <Button Content="Forget remembered API key" Command="{Binding ForgetApiKeyCommand}"
-                        IsEnabled="{Binding HasRememberedKey}"/>
-                <Button Content="Sign out" Command="{Binding SignOutCommand}" Margin="8,0,0,0"/>
-            </StackPanel>
-
-            <Separator/>
-            <TextBlock Text="Appearance" Style="{DynamicResource SubHeaderText}"/>
-            <TextBlock Text="Theme" Style="{DynamicResource DimText}" Margin="0,6,0,2"/>
-            <ComboBox ItemsSource="{Binding ThemeOptions}" SelectedItem="{Binding Theme}"
-                      Width="140" HorizontalAlignment="Left"/>
-            <TextBlock Text="Font size" Style="{DynamicResource DimText}" Margin="0,8,0,2"/>
-            <ComboBox ItemsSource="{Binding FontScaleOptions}" SelectedItem="{Binding FontScale}"
-                      Width="140" HorizontalAlignment="Left"/>
-
-            <Separator/>
-            <StackPanel Orientation="Horizontal">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:WHDClient.Behaviors">
+    <DockPanel>
+        <!-- Fixed footer: Save stays visible regardless of window height -->
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource BorderBrushDim}" BorderThickness="0,1,0,0" Padding="16,10">
+            <StackPanel MaxWidth="640" HorizontalAlignment="Left" Orientation="Horizontal">
                 <Button Content="Save settings" Style="{DynamicResource AccentButton}" Command="{Binding SaveCommand}" Padding="14,6"/>
                 <TextBlock Text="{Binding SavedMessage}" Style="{DynamicResource DimText}" VerticalAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>
-        </StackPanel>
-    </ScrollViewer>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      beh:ScrollWheelSpeed.PixelsPerNotch="24">
+            <StackPanel Margin="16" MaxWidth="640" HorizontalAlignment="Left">
+                <TextBlock Text="Settings" Style="{DynamicResource HeaderText}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="{Binding CurrentUserText}" Style="{DynamicResource DimText}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Connection" Style="{DynamicResource SubHeaderText}"/>
+                <TextBlock Text="Server URL" Style="{DynamicResource DimText}" Margin="0,6,0,2"/>
+                <TextBox Text="{Binding ServerUrl, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Poll interval (seconds, min 15)" Style="{DynamicResource DimText}" Margin="0,8,0,2"/>
+                <TextBox Text="{Binding PollIntervalSeconds, UpdateSourceTrigger=PropertyChanged}" Width="80" HorizontalAlignment="Left"/>
+                <TextBlock Text="Tickets per page (smaller pages load faster)" Style="{DynamicResource DimText}" Margin="0,8,0,2"/>
+                <ComboBox ItemsSource="{Binding PageSizeOptions}" SelectedItem="{Binding PageSize}"
+                          Width="80" HorizontalAlignment="Left"/>
+
+                <Separator/>
+                <TextBlock Text="Notifications" Style="{DynamicResource SubHeaderText}"/>
+                <CheckBox Content="Enable Windows toast notifications" IsChecked="{Binding NotificationsEnabled}" Margin="0,6,0,0"/>
+                <CheckBox Content="When a ticket is assigned to me" IsChecked="{Binding NotifyAssignedToMe}"/>
+                <CheckBox Content="When one of my tickets is updated" IsChecked="{Binding NotifyMyTicketUpdated}"/>
+                <CheckBox Content="When a new ticket matches an alert filter" IsChecked="{Binding NotifyNewMatching}"/>
+
+                <TextBlock Text="Alert filters (saved filters that trigger notifications on new matches)"
+                           Style="{DynamicResource DimText}" Margin="0,10,0,4"/>
+                <ItemsControl ItemsSource="{Binding AlertFilters}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Margin="0,1">
+                                <CheckBox IsChecked="{Binding AlertOnNew}"
+                                          Click="AlertFilter_Click" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Text="Create filters on the Search page, then enable alerts here."
+                           Style="{DynamicResource DimText}" Margin="0,4,0,0"/>
+
+                <Separator/>
+                <TextBlock Text="Updates" Style="{DynamicResource SubHeaderText}"/>
+                <TextBlock Text="{Binding CurrentVersionText}" Style="{DynamicResource DimText}" Margin="0,6,0,2"/>
+                <TextBlock Text="{Binding UpdateStatus}" Style="{DynamicResource DimText}" Margin="0,4,0,0"/>
+                <Button Content="Download update" Command="{Binding OpenUpdateDownloadCommand}"
+                        HorizontalAlignment="Left" Margin="0,6,0,0"
+                        Visibility="{Binding UpdateUrl, Converter={StaticResource NullToVisConverter}}"/>
+
+                <Separator/>
+                <TextBlock Text="Sign-in" Style="{DynamicResource SubHeaderText}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <Button Content="Forget remembered API key" Command="{Binding ForgetApiKeyCommand}"
+                            IsEnabled="{Binding HasRememberedKey}"/>
+                    <Button Content="Sign out" Command="{Binding SignOutCommand}" Margin="8,0,0,0"/>
+                </StackPanel>
+
+                <Separator/>
+                <TextBlock Text="Appearance" Style="{DynamicResource SubHeaderText}"/>
+                <TextBlock Text="Theme" Style="{DynamicResource DimText}" Margin="0,6,0,2"/>
+                <ComboBox ItemsSource="{Binding ThemeOptions}" SelectedItem="{Binding Theme}"
+                          Width="140" HorizontalAlignment="Left"/>
+                <TextBlock Text="Font size" Style="{DynamicResource DimText}" Margin="0,8,0,2"/>
+                <ComboBox ItemsSource="{Binding FontScaleOptions}" SelectedItem="{Binding FontScale}"
+                          Width="140" HorizontalAlignment="Left"/>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
 </UserControl>

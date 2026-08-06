@@ -132,7 +132,8 @@
                                 <DockPanel>
                                     <TextBlock Text="Notifications" Style="{DynamicResource SubHeaderText}" DockPanel.Dock="Left"/>
                                 </DockPanel>
-                                <ScrollViewer Grid.Row="1" MaxHeight="360" VerticalScrollBarVisibility="Auto">
+                                <ScrollViewer Grid.Row="1" MaxHeight="360" VerticalScrollBarVisibility="Auto"
+                                              beh:ScrollWheelSpeed.PixelsPerNotch="24">
                                     <ItemsControl ItemsSource="{Binding Notifications.Notifications}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
