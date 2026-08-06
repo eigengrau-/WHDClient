@@ -13,6 +13,10 @@ public static class DarkTitleBar
     // Attribute 20 is used by Windows 11 and recent Windows 10 builds; 19 by older Windows 10 builds.
     private const int DwmwaUseImmersiveDarkModeOld = 19;
     private const int DwmwaUseImmersiveDarkMode = 20;
+    // Windows 11: DWM rounds window corners per-window; applying the dark-mode attribute can
+    // reset this, so explicitly request rounded corners (DWMWCP_ROUND). Harmless no-op on Windows 10.
+    private const int DwmwaWindowCornerPreference = 33;
+    private const int DwmcpRound = 2;
 
     [DllImport("dwmapi.dll", PreserveSig = true)]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
@@ -32,5 +36,8 @@ public static class DarkTitleBar
         int useDark = dark ? 1 : 0;
         if (DwmSetWindowAttribute(hwnd, DwmwaUseImmersiveDarkMode, ref useDark, sizeof(int)) != 0)
             DwmSetWindowAttribute(hwnd, DwmwaUseImmersiveDarkModeOld, ref useDark, sizeof(int));
+
+        int corner = DwmcpRound;
+        DwmSetWindowAttribute(hwnd, DwmwaWindowCornerPreference, ref corner, sizeof(int));
     }
 }

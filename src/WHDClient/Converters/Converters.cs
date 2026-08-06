@@ -75,8 +75,9 @@ public class StatusToBrushConverter : IValueConverter
 
 public class DateTimeLocalConverter : IValueConverter
 {
+    /// <summary>Shows the date exactly as the WHD API returned it (no local-timezone shift).</summary>
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        => value is DateTimeOffset dto ? dto.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : value?.ToString() ?? "";
+        => value is DateTimeOffset dto ? dto.ToString("yyyy-MM-dd HH:mm") : value?.ToString() ?? "";
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotSupportedException();

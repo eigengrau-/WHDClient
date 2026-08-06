@@ -35,9 +35,9 @@ public partial class TicketRow : ObservableObject
         Location = t.Location?.DisplayName ?? "",
         Tech = t.ClientTech?.DisplayName ?? "",
         LastUpdatedStamp = t.EffectiveLastUpdated,
-        LastUpdated = t.EffectiveLastUpdated?.ToLocalTime().ToString("yy-MM-dd HH:mm") ?? t.PrettyLastUpdated ?? "",
+        LastUpdated = t.EffectiveLastUpdated?.ToString("yy-MM-dd HH:mm") ?? t.PrettyLastUpdated ?? "",
         ReportDateStamp = t.ReportDateUtc,
-        ReportDate = t.ReportDateUtc?.ToLocalTime().ToString("yy-MM-dd HH:mm") ?? ""
+        ReportDate = t.ReportDateUtc?.ToString("yy-MM-dd HH:mm") ?? ""
     };
 }
 
