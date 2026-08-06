@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -24,6 +25,9 @@ public partial class NotificationService : ObservableObject
 {
     private readonly SettingsService _settings;
 
+    /// <summary>Tickets the signed-in user has just modified themselves; their own changes must not re-notify them.</summary>
+    private readonly ConcurrentDictionary<int, DateTimeOffset> _selfModified = new();
+
     public ObservableCollection<AppNotification> Notifications { get; } = new();
 
     [ObservableProperty]
@@ -36,10 +40,16 @@ public partial class NotificationService : ObservableObject
         _settings = settings;
     }
 
+    /// <summary>Records that the user themselves changed this ticket, so the next detected change is not re-notified.</summary>
+    public void MarkSelfModified(int ticketId) => _selfModified[ticketId] = DateTimeOffset.UtcNow;
+
     public void NotifyChanges(IReadOnlyList<TicketChange> changes)
     {
         foreach (var change in changes)
         {
+            if (WasSelfModified(change))
+                continue;
+
             var (title, message) = Describe(change);
             var notification = new AppNotification
             {
@@ -56,8 +66,19 @@ public partial class NotificationService : ObservableObject
             });
 
             if (_settings.Settings.NotificationsEnabled)
-                ShowToast(title, message);
+                ShowToast(title, message, ticketId: change.TicketId);
         }
+    }
+
+    /// <summary>True when the change is just the user's own edit of a ticket they recently modified.</summary>
+    private bool WasSelfModified(TicketChange change)
+    {
+        if (change.Kind != TicketChangeKind.MyTicketUpdated) return false;
+        if (!_selfModified.TryRemove(change.TicketId, out var at)) return false;
+        // The poll that surfaces the change runs up to one interval after the edit; allow that
+        // plus a small margin. Outside the window a change is treated as someone else's.
+        var grace = TimeSpan.FromSeconds(Math.Max(_settings.Settings.PollIntervalSeconds * 2, 120));
+        return DateTimeOffset.UtcNow - at <= grace;
     }
 
     /// <summary>Alerts the user that a newer app version is available (in-app feed + toast).</summary>
@@ -80,7 +101,7 @@ public partial class NotificationService : ObservableObject
         });
 
         if (_settings.Settings.NotificationsEnabled)
-            ShowToast(notification.Title, notification.Message, notification.Url);
+            ShowToast(notification.Title, notification.Message, url: notification.Url);
     }
 
     private (string Title, string Message) Describe(TicketChange c) => c.Kind switch
@@ -94,7 +115,7 @@ public partial class NotificationService : ObservableObject
         _ => ("Ticket change", $"#{c.TicketId}: {c.Subject}")
     };
 
-    private static void ShowToast(string title, string message, string? url = null)
+    private static void ShowToast(string title, string message, string? url = null, int? ticketId = null)
     {
         try
         {
@@ -102,9 +123,11 @@ public partial class NotificationService : ObservableObject
                 .AddText(title)
                 .AddText(message);
             // Clicking the toast fires ToastNotificationManagerCompat.OnActivated (App.OnStartup)
-            // with these arguments; "url" means "open this link in the browser".
+            // with these arguments; "url" opens a link in the browser, "ticketId" opens the ticket.
             if (!string.IsNullOrEmpty(url))
                 builder.AddArgument("url", url);
+            if (ticketId.HasValue)
+                builder.AddArgument("ticketId", ticketId.Value.ToString());
             builder.Show();
         }
         catch

@@ -116,7 +116,7 @@ public partial class MainViewModel : ObservableObject
             _ = existing.RefreshAsync();
             return;
         }
-        var tab = new TicketTabViewModel(_session, _settings, ticketId, OnBookmarkChanged);
+        var tab = new TicketTabViewModel(_session, _settings, _notifications, ticketId, OnBookmarkChanged);
         tab.CloseRequested += (_, _) => CloseTab(tab);
         Tabs.Add(tab);
         SelectedTab = tab;

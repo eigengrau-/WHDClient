@@ -14,6 +14,7 @@ public partial class TicketTabViewModel : TabViewModelBase
 {
     private readonly WhdSessionContext _session;
     private readonly SettingsService _settings;
+    private readonly NotificationService _notifications;
     private readonly Action? _bookmarkChanged;
 
     public override bool IsClosable => true;
@@ -81,11 +82,12 @@ public partial class TicketTabViewModel : TabViewModelBase
     /// <summary>Files staged in the reply panel; uploaded onto the note when it is posted.</summary>
     public ObservableCollection<string> PendingReplyAttachments { get; } = new();
 
-    public TicketTabViewModel(WhdSessionContext session, SettingsService settings, int ticketId,
-        Action? bookmarkChanged = null)
+    public TicketTabViewModel(WhdSessionContext session, SettingsService settings, NotificationService notifications,
+        int ticketId, Action? bookmarkChanged = null)
     {
         _session = session;
         _settings = settings;
+        _notifications = notifications;
         _bookmarkChanged = bookmarkChanged;
         TicketId = ticketId;
         Header = $"#{ticketId}";
@@ -218,6 +220,7 @@ public partial class TicketTabViewModel : TabViewModelBase
             }
             await _session.Tickets.UpdateTicketAsync(TicketId, payload);
             InfoMessage = "Saved.";
+            _notifications.MarkSelfModified(TicketId);
             await RefreshCoreAsync();
         }
         catch (Exception ex)
@@ -285,6 +288,7 @@ public partial class TicketTabViewModel : TabViewModelBase
             InfoMessage = uploadFailures.Count == 0
                 ? "Note added."
                 : $"Note added, but {uploadFailures.Count} attachment(s) failed: {string.Join("; ", uploadFailures)}";
+            _notifications.MarkSelfModified(TicketId);
             await RefreshCoreAsync();
         }
         catch (Exception ex)

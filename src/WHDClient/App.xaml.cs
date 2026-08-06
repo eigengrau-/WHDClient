@@ -14,6 +14,9 @@ public partial class App : Application
 {
     public static IServiceProvider Services { get; private set; } = null!;
 
+    /// <summary>Ticket id from a toast clicked before the main window was ready (cold start).</summary>
+    private static int? _pendingToastTicketId;
+
     private static readonly string LogPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WHDClient", "startup.log");
 
@@ -53,7 +56,8 @@ public partial class App : Application
         Log("base.OnStartup done");
 
         // Toast click activation: toasts carrying a "url" argument (e.g. update available)
-        // open that link in the default browser. Must be registered before any toast is shown.
+        // open that link in the default browser; "ticketId" opens the ticket in the app.
+        // Must be registered before any toast is shown.
         ToastNotificationManagerCompat.OnActivated += toastArgs =>
         {
             try
@@ -61,7 +65,13 @@ public partial class App : Application
                 Log($"toast activated: {toastArgs.Argument}");
                 var args = ToastArguments.Parse(toastArgs.Argument);
                 if (args.TryGetValue("url", out var url) && !string.IsNullOrWhiteSpace(url))
+                {
                     Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                else if (args.TryGetValue("ticketId", out var ticketId) && int.TryParse(ticketId, out var id))
+                {
+                    Application.Current?.Dispatcher.Invoke(() => OpenTicketFromToast(id));
+                }
             }
             catch (Exception ex)
             {
@@ -115,6 +125,13 @@ public partial class App : Application
                 login.Show();
                 Log("LoginWindow shown");
             }
+
+            // A toast clicked while the app was cold-starting queued a ticket to open.
+            if (_pendingToastTicketId is int pending)
+            {
+                _pendingToastTicketId = null;
+                _ = Application.Current.Dispatcher.InvokeAsync(() => OpenTicketFromToast(pending));
+            }
         }
         catch (Exception ex)
         {
@@ -122,6 +139,22 @@ public partial class App : Application
             MessageBox.Show(ex.ToString(), "WHDClient failed to start",
                 MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(1);
+        }
+    }
+
+    /// <summary>Opens a ticket requested via toast click, once the app is up.</summary>
+    private static void OpenTicketFromToast(int ticketId)
+    {
+        try
+        {
+            if (Services?.GetService<MainViewModel>() is { } main && Current?.MainWindow != null)
+                main.OpenTicket(ticketId);
+            else
+                _pendingToastTicketId = ticketId;
+        }
+        catch (Exception ex)
+        {
+            Log($"open ticket from toast failed: {ex.Message}");
         }
     }
 }
