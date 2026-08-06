@@ -36,4 +36,20 @@ public class DemoDataHandlerTests
         Assert.NotEqual(all.Count, allUnassigned);
         Assert.NotEmpty(all);
     }
+
+    [Fact]
+    public async Task UpdateTicket_ClientTechNull_UnassignsTech()
+    {
+        using var handler = new DemoDataHandler();
+        using var api = new WhdApiClient(DemoDataHandler.DemoServerUrl, "DEMO", handler);
+
+        // #1001 starts assigned to tech 1.
+        var before = await api.GetAsync<Ticket>("/Tickets/1001");
+        Assert.NotNull(before!.ClientTech);
+
+        await api.PutAsync<Ticket>("/Tickets/1001", new Dictionary<string, object?> { ["clientTech"] = null });
+
+        var after = await api.GetAsync<Ticket>("/Tickets/1001");
+        Assert.Null(after!.ClientTech);
+    }
 }

@@ -43,7 +43,7 @@ public class DemoDataHandler : HttpMessageHandler
             ("GET", var p) when Regex.IsMatch(p, @"^/Tickets/\d+$") => DemoData.TicketById(IdOf(p)),
             ("GET", "/Tickets") => DemoData.Page(DemoData.Search(q.GetValueOrDefault("qualifier")), q),
             ("POST", "/Tickets") => DemoData.TicketById(1001),
-            ("PUT", var p) when Regex.IsMatch(p, @"^/Tickets/\d+$") => DemoData.TicketById(IdOf(p)),
+            ("PUT", var p) when Regex.IsMatch(p, @"^/Tickets/\d+$") => DemoData.ApplyTicketUpdate(IdOf(p), ReadBody(req)),
             ("POST", "/TechNotes") => DemoData.NotesFor(1001)[0],
             _ => null
         };
@@ -80,6 +80,9 @@ public class DemoDataHandler : HttpMessageHandler
             Encoding.UTF8, "application/json");
 
     private static int IdOf(string path) => int.Parse(path[(path.LastIndexOf('/') + 1)..]);
+
+    private static string ReadBody(HttpRequestMessage req)
+        => req.Content == null ? "" : req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
     private static int Int(Dictionary<string, string> q, string key)
         => q.TryGetValue(key, out var v) && int.TryParse(v, out var n) ? n : 0;
@@ -341,6 +344,29 @@ internal static class DemoData
 
     public static Tech TechById(int id) => Techs.FirstOrDefault(t => t.Id == id) ?? Techs[0];
     public static RequestType RequestTypeById(int id) => RequestTypes.FirstOrDefault(r => r.Id == id) ?? RequestTypes[0];
+
+    /// <summary>Applies an update payload to a ticket (demo: clientTech assign/unassign) and returns it.</summary>
+    public static Ticket ApplyTicketUpdate(int id, string body)
+    {
+        var ticket = TicketById(id);
+        if (string.IsNullOrWhiteSpace(body)) return ticket;
+        using var doc = JsonDocument.Parse(body);
+        if (doc.RootElement.TryGetProperty("clientTech", out var tech))
+        {
+            ticket.ClientTech = tech.ValueKind == JsonValueKind.Null ? null : TechById(IntOf(tech));
+            ticket.LastUpdatedUtc = DateTimeOffset.UtcNow;
+            ticket.LastUpdated = DateTimeOffset.UtcNow;
+            ticket.PrettyLastUpdated = "just now";
+        }
+        return ticket;
+    }
+
+    private static int IntOf(JsonElement e) =>
+        e.ValueKind == JsonValueKind.Number && e.TryGetInt32(out var n)
+            ? n
+            : e.ValueKind == JsonValueKind.Object && e.TryGetProperty("id", out var id)
+                ? IntOf(id)
+                : 0;
 
     /// <summary>Unknown ids (e.g. opened by number) get a plausible generated ticket.</summary>
     public static Ticket TicketById(int id) => All.FirstOrDefault(t => t.Id == id) ?? BuildTicket(

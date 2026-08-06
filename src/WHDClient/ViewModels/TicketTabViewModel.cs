@@ -152,7 +152,11 @@ public partial class TicketTabViewModel : TabViewModelBase
 
             SelectedStatus = StatusTypes.FirstOrDefault(s => s.Id == ticket.StatusType?.Id);
             SelectedPriority = PriorityTypes.FirstOrDefault(p => p.Id == ticket.PriorityType?.Id);
-            SelectedTech = Techs.FirstOrDefault(t => t.Id == ticket.ClientTech?.Id);
+            if (!Techs.Contains(Tech.NotAssigned))
+                Techs.Insert(0, Tech.NotAssigned);
+            SelectedTech = ticket.ClientTech == null
+                ? Tech.NotAssigned
+                : Techs.FirstOrDefault(t => t.Id == ticket.ClientTech.Id);
             if (SelectedTech == null && ticket.ClientTech != null)
             {
                 // The assigned tech may be inactive — keep them visible and selected anyway.
@@ -177,6 +181,8 @@ public partial class TicketTabViewModel : TabViewModelBase
         {
             foreach (var s in await _session.Lookups.GetStatusTypesAsync()) StatusTypes.Add(s);
             foreach (var p in await _session.Lookups.GetPriorityTypesAsync()) PriorityTypes.Add(p);
+            // "Not Assigned" (clears clientTech) at the top, then the real techs.
+            Techs.Add(Tech.NotAssigned);
             foreach (var t in await _session.Lookups.GetActiveTechsAsync()) Techs.Add(t);
         }
     }
@@ -210,7 +216,12 @@ public partial class TicketTabViewModel : TabViewModelBase
                 payload["statustype"] = new EntityRef(SelectedStatus.Id, "StatusType");
             if (SelectedPriority != null && SelectedPriority.Id != Ticket.PriorityType?.Id)
                 payload["prioritytype"] = new EntityRef(SelectedPriority.Id, "PriorityType");
-            if (SelectedTech != null && SelectedTech.Id != Ticket.ClientTech?.Id)
+            if (ReferenceEquals(SelectedTech, Tech.NotAssigned))
+            {
+                if (Ticket.ClientTech != null)
+                    payload["clientTech"] = null; // unassign: clears the ticket's tech
+            }
+            else if (SelectedTech != null && SelectedTech.Id != Ticket.ClientTech?.Id)
                 payload["clientTech"] = new EntityRef(SelectedTech.Id, "Tech");
 
             if (payload.Count == 0)
