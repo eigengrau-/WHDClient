@@ -61,13 +61,8 @@
             <ComboBox ItemsSource="{Binding ThemeOptions}" SelectedItem="{Binding Theme}"
                       Width="140" HorizontalAlignment="Left"/>
             <TextBlock Text="Font size" Style="{DynamicResource DimText}" Margin="0,8,0,2"/>
-            <StackPanel Orientation="Horizontal">
-                <Button Content="A−" Command="{Binding DecreaseFontSizeCommand}" Padding="10,4"
-                        AutomationProperties.Name="Decrease font size"/>
-                <TextBlock Text="{Binding FontSize, StringFormat={}{0:0} pt}" VerticalAlignment="Center" Margin="10,0"/>
-                <Button Content="A+" Command="{Binding IncreaseFontSizeCommand}" Padding="10,4"
-                        AutomationProperties.Name="Increase font size"/>
-            </StackPanel>
+            <ComboBox ItemsSource="{Binding FontScaleOptions}" SelectedItem="{Binding FontScale}"
+                      Width="140" HorizontalAlignment="Left"/>
 
             <Separator/>
             <StackPanel Orientation="Horizontal">

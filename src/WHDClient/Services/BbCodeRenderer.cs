@@ -49,7 +49,7 @@ public static class BbCodeRenderer
                     doc.Blocks.Add(new Paragraph(new Run(code.Text))
                     {
                         FontFamily = new FontFamily("Consolas"),
-                        FontSize = 12,
+                        FontSize = Resource<double>("FontSize12"),
                         Background = Resource<Brush>("Panel2Brush"),
                         BorderBrush = Resource<Brush>("BorderBrushDim"),
                         BorderThickness = new Thickness(1),

@@ -19,7 +19,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBox Style="{DynamicResource SelectableText}" VerticalAlignment="Center"
-                             Foreground="{DynamicResource HeaderBrush}" FontSize="20" FontWeight="SemiBold">
+                             Foreground="{DynamicResource HeaderBrush}" FontSize="{DynamicResource FontSize20}" FontWeight="SemiBold">
                         <TextBox.Text>
                             <MultiBinding StringFormat="#{0} {1}">
                                 <Binding Path="Ticket.Id" Mode="OneWay"/>
@@ -31,20 +31,20 @@
                         <Button Command="{Binding ToggleBookmarkCommand}" ToolTip="{Binding BookmarkLabel}"
                                 AutomationProperties.Name="{Binding BookmarkLabel}" Padding="6,3" Margin="4,0">
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="{Binding BookmarkIconSource}" Width="14" Height="14" Margin="0,0,6,0"/>
+                                 <Image Source="{Binding BookmarkIconSource}" Width="14" Height="14" Margin="0,0,6,0" beh:IconTint.Tint="{DynamicResource TextBrush}"/>
                                 <TextBlock Text="{Binding BookmarkLabel}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         <Button Command="{Binding RefreshCommand}" AutomationProperties.Name="Refresh" Padding="10,3" Margin="4,0">
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://application:,,,/Assets/icons/refresh.png" Width="14" Height="14" Margin="0,0,6,0"/>
+                                 <Image Source="pack://application:,,,/Assets/icons/refresh.png" Width="14" Height="14" Margin="0,0,6,0" beh:IconTint.Tint="{DynamicResource TextBrush}"/>
                                 <TextBlock Text="Refresh" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         <Button Command="{Binding OpenInBrowserCommand}" AutomationProperties.Name="Open in browser"
                                 Padding="10,3" Margin="4,0">
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://application:,,,/Assets/icons/link.png" Width="14" Height="14" Margin="0,0,6,0"/>
+                                 <Image Source="pack://application:,,,/Assets/icons/link.png" Width="14" Height="14" Margin="0,0,6,0" beh:IconTint.Tint="{DynamicResource TextBrush}"/>
                                 <TextBlock Text="Open in browser" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -84,7 +84,7 @@
                     <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto">
                         <RichTextBox beh:BbCode.Text="{Binding Ticket.DisplayDetail, Mode=OneWay}"
                                      Style="{DynamicResource SelectableRichText}"
-                                     Foreground="White" FontSize="12"/>
+                                     FontSize="{DynamicResource FontSize12}"/>
                     </ScrollViewer>
                 </Border>
 
@@ -157,11 +157,11 @@
                                                            Visibility="{Binding IsHidden, Converter={StaticResource BoolToVisConverter}}"/>
                                             </StackPanel>
                                             <TextBox Text="{Binding EffectiveDate, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}"
-                                                     Style="{DynamicResource SelectableText}" Foreground="{DynamicResource TextDimBrush}" FontSize="11"
+                                                     Style="{DynamicResource SelectableText}" Foreground="{DynamicResource TextDimBrush}" FontSize="{DynamicResource FontSize11}"
                                                      HorizontalAlignment="Right"/>
                                         </DockPanel>
                                         <RichTextBox beh:BbCode.Text="{Binding DisplayText, Mode=OneWay}"
-                                                     Style="{DynamicResource SelectableRichText}" Margin="0,4,0,0" FontSize="12"/>
+                                                     Style="{DynamicResource SelectableRichText}" Margin="0,4,0,0" FontSize="{DynamicResource FontSize12}"/>
                                         <ItemsControl ItemsSource="{Binding Attachments}" Margin="0,6,0,0">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
@@ -184,7 +184,7 @@
                 <!-- Ticket-level attachments -->
                 <Border Grid.Row="1" Background="{DynamicResource Panel2Brush}" CornerRadius="4" Padding="10" Margin="0,4,10,0">
                     <StackPanel>
-                        <TextBlock Text="Ticket attachments" Style="{DynamicResource SubHeaderText}" FontSize="12"/>
+                        <TextBlock Text="Ticket attachments" Style="{DynamicResource SubHeaderText}" FontSize="{DynamicResource FontSize12}"/>
                         <ItemsControl ItemsSource="{Binding Ticket.Attachments}" Margin="0,6,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -262,11 +262,11 @@
                                     <Border Background="{DynamicResource Panel2Brush}" BorderBrush="{DynamicResource BorderBrushDim}"
                                             BorderThickness="1" CornerRadius="3" Padding="6,1" Margin="0,0,4,2">
                                         <DockPanel>
-                                            <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="10"
+                                            <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="{DynamicResource FontSize10}"
                                                     Background="Transparent" BorderThickness="0"
                                                     Command="{Binding DataContext.RemoveCcRecipientCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                     CommandParameter="{Binding}"/>
-                                            <TextBlock Text="{Binding Label}" FontSize="11" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSize11}" VerticalAlignment="Center"/>
                                         </DockPanel>
                                     </Border>
                                 </DataTemplate>
@@ -282,11 +282,11 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel Margin="0,1">
-                                        <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="10"
+                                        <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="{DynamicResource FontSize10}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Command="{Binding DataContext.RemoveReplyAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                 CommandParameter="{Binding}"/>
-                                        <TextBlock Text="{Binding}" Style="{DynamicResource DimText}" FontSize="12"
+                                        <TextBlock Text="{Binding}" Style="{DynamicResource DimText}" FontSize="{DynamicResource FontSize12}"
                                                    TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
                                     </DockPanel>
                                 </DataTemplate>

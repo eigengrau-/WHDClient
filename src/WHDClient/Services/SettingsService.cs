@@ -30,8 +30,8 @@ public class AppSettings
     public bool NotifyNewMatching { get; set; } = true;
     /// <summary>Theme name ("Dark" or "Light").</summary>
     public string Theme { get; set; } = "Dark";
-    /// <summary>Base app font size in device-independent pixels.</summary>
-    public double FontSize { get; set; } = 14;
+    /// <summary>Font size preset: "Small", "Medium", or "Large".</summary>
+    public string FontScale { get; set; } = ThemeService.MediumScale;
     public List<SavedFilter> SavedFilters { get; set; } = new();
     /// <summary>Ticket ids the user has bookmarked.</summary>
     public List<int> BookmarkedTicketIds { get; set; } = new();

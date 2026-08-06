@@ -33,7 +33,7 @@
 
     <!-- Larger default font size app-wide (cascades from every Window) -->
     <Style TargetType="Window">
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
     </Style>
 
     <!-- Keyed styles merged from the legacy Style.xaml -->
@@ -47,7 +47,7 @@
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="Margin" Value="0"/>
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontSize" Value="{DynamicResource FieldFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource TextDimBrush}"/>
     </Style>
     <Style x:Key="ProfilePicture" TargetType="Ellipse">
@@ -96,21 +96,21 @@
     <!-- Header text -->
     <Style x:Key="HeaderText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource HeaderBrush}"/>
-        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontSize" Value="{DynamicResource HeaderFontSize}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
     <Style x:Key="SubHeaderText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource HeaderBrush}"/>
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="{DynamicResource SubHeaderFontSize}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
     <Style x:Key="DimText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource TextDimBrush}"/>
-        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontSize" Value="{DynamicResource DimFontSize}"/>
     </Style>
     <!-- Small label shown above a field value (ticket details, forms) -->
     <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource DimText}">
-        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontSize" Value="{DynamicResource FieldFontSize}"/>
         <Setter Property="Opacity" Value="0.8"/>
     </Style>
 
