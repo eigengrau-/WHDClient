@@ -73,6 +73,12 @@ public partial class LoginViewModel : ObservableObject
             ErrorMessage = "Enter your Tech API key.";
             return;
         }
+        if (!Uri.TryCreate(ServerUrl.Trim().TrimEnd('/'), UriKind.Absolute, out var uri)
+            || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            ErrorMessage = "Enter your Web Help Desk URL first (e.g. https://webhelpdesk.example.com).";
+            return;
+        }
 
         IsBusy = true;
         ErrorMessage = null;

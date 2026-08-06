@@ -5,7 +5,7 @@
         xmlns:views="clr-namespace:WHDClient.Views"
         Title="WHD Client" Width="1564" Height="830.6667" MinWidth="1000" MinHeight="650"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource BgBrush}">
+        Background="{DynamicResource BgBrush}">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:MyTicketsViewModel}"><views:MyTicketsView/></DataTemplate>
         <DataTemplate DataType="{x:Type vm:SearchViewModel}"><views:SearchView/></DataTemplate>
@@ -23,7 +23,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Left navigation -->
-        <Border Background="{StaticResource Panel2Brush}" BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="0,0,1,0">
+        <Border Background="{DynamicResource Panel2Brush}" BorderBrush="{DynamicResource BorderBrushDim}" BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -35,9 +35,9 @@
                     <StackPanel Orientation="Horizontal">
                         <Image Source="pack://application:,,,/Assets/life-preserver.png"
                                Width="26" Height="26" Margin="0,0,8,0"/>
-                        <TextBlock Text="WHD Client" Style="{StaticResource HeaderText}" VerticalAlignment="Center"/>
+                        <TextBlock Text="WHD Client" Style="{DynamicResource HeaderText}" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <TextBlock Text="{Binding UserDisplay}" Style="{StaticResource DimText}" Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding UserDisplay}" Style="{DynamicResource DimText}" Margin="0,4,0,0"/>
                 </StackPanel>
 
                 <StackPanel Grid.Row="1" Margin="10,6">
@@ -84,7 +84,7 @@
 
                     <Separator/>
 
-                    <Button Style="{StaticResource AccentButton}"
+                    <Button Style="{DynamicResource AccentButton}"
                             AutomationProperties.Name="New Ticket"
                             Command="{Binding OpenNewTicketCommand}" HorizontalContentAlignment="Left" Margin="0,2">
                         <StackPanel Orientation="Horizontal">
@@ -93,7 +93,7 @@
                         </StackPanel>
                     </Button>
 
-                    <TextBlock Text="Open ticket #" Margin="4,16,0,4" Style="{StaticResource DimText}"/>
+                    <TextBlock Text="Open ticket #" Margin="4,16,0,4" Style="{DynamicResource DimText}"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -112,7 +112,7 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🔔 "/>
                             <TextBlock Text="Notifications"/>
-                            <Border Background="{StaticResource HeaderBrush}" CornerRadius="8" Margin="6,0,0,0"
+                            <Border Background="{DynamicResource HeaderBrush}" CornerRadius="8" Margin="6,0,0,0"
                                     Padding="6,1" Visibility="{Binding Notifications.UnreadCount, Converter={StaticResource PositiveIntToVisConverter}}">
                                 <TextBlock Text="{Binding Notifications.UnreadCount}" Foreground="White" FontSize="10"/>
                             </Border>
@@ -121,7 +121,7 @@
                     <Popup Placement="Top" PlacementTarget="{Binding ElementName=NotifyToggle}"
                            IsOpen="{Binding IsChecked, ElementName=NotifyToggle, Mode=TwoWay}"
                            StaysOpen="False" Width="380" MaxHeight="420">
-                        <Border Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource HeaderBrush}"
+                        <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource HeaderBrush}"
                                 BorderThickness="1" CornerRadius="4" Padding="10">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -129,21 +129,21 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <DockPanel>
-                                    <TextBlock Text="Notifications" Style="{StaticResource SubHeaderText}" DockPanel.Dock="Left"/>
+                                    <TextBlock Text="Notifications" Style="{DynamicResource SubHeaderText}" DockPanel.Dock="Left"/>
                                 </DockPanel>
                                 <ScrollViewer Grid.Row="1" MaxHeight="360" VerticalScrollBarVisibility="Auto">
                                     <ItemsControl ItemsSource="{Binding Notifications.Notifications}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="0,0,0,1"
+                                                <Border BorderBrush="{DynamicResource BorderBrushDim}" BorderThickness="0,0,0,1"
                                                         Padding="2,6" MouseLeftButtonUp="Notification_Click" Cursor="Hand"
                                                         Tag="{Binding}">
                                                     <StackPanel>
-                                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource HeaderBrush}"/>
+                                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{DynamicResource HeaderBrush}"/>
                                                         <TextBlock Text="{Binding Message}" FontSize="12"/>
-                                                        <TextBlock Text="Open download page" FontSize="12" Foreground="{StaticResource LinkBrush}"
+                                                        <TextBlock Text="Open download page" FontSize="12" Foreground="{DynamicResource LinkBrush}"
                                                                    Visibility="{Binding Url, Converter={StaticResource NullToVisConverter}}"/>
-                                                        <TextBlock Text="{Binding TimeDisplay}" Style="{StaticResource DimText}"/>
+                                                        <TextBlock Text="{Binding TimeDisplay}" Style="{DynamicResource DimText}"/>
                                                     </StackPanel>
                                                 </Border>
                                             </DataTemplate>
@@ -154,7 +154,7 @@
                         </Border>
                     </Popup>
 
-                    <TextBlock Text="{Binding StatusText}" Style="{StaticResource DimText}" Margin="4,10,0,4"/>
+                    <TextBlock Text="{Binding StatusText}" Style="{DynamicResource DimText}" Margin="4,10,0,4"/>
                     <Button Command="{Binding SignOutCommand}" AutomationProperties.Name="Sign out" HorizontalContentAlignment="Left">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="pack://application:,,,/Assets/icons/sign-out.png" Width="14" Height="14" Margin="0,0,8,0"/>

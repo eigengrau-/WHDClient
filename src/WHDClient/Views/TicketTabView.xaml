@@ -11,15 +11,15 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Background="{StaticResource PanelBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,6">
+        <Border Background="{DynamicResource PanelBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,6">
             <StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox Style="{StaticResource SelectableText}" VerticalAlignment="Center"
-                             Foreground="{StaticResource HeaderBrush}" FontSize="20" FontWeight="SemiBold">
+                    <TextBox Style="{DynamicResource SelectableText}" VerticalAlignment="Center"
+                             Foreground="{DynamicResource HeaderBrush}" FontSize="20" FontWeight="SemiBold">
                         <TextBox.Text>
                             <MultiBinding StringFormat="#{0} {1}">
                                 <Binding Path="Ticket.Id" Mode="OneWay"/>
@@ -52,39 +52,39 @@
                 </Grid>
 
                 <!-- Ticket meta: label-above-value fields in a card -->
-                <Border Background="{StaticResource Panel2Brush}" CornerRadius="4" Padding="12,8" Margin="0,10,0,0">
+                <Border Background="{DynamicResource Panel2Brush}" CornerRadius="4" Padding="12,8" Margin="0,10,0,0">
                     <WrapPanel>
                         <StackPanel MinWidth="150" Margin="0,2,28,2">
-                            <TextBlock Text="CLIENT" Style="{StaticResource FieldLabel}"/>
-                            <TextBox Text="{Binding Ticket.ClientReporter.DisplayName, Mode=OneWay}" Style="{StaticResource SelectableText}"/>
+                            <Label Content="CLIENT" Style="{DynamicResource PropertyLabel}"/>
+                            <TextBox Text="{Binding Ticket.ClientReporter.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
                         </StackPanel>
                         <StackPanel MinWidth="150" Margin="0,2,28,2">
-                            <TextBlock Text="LOCATION" Style="{StaticResource FieldLabel}"/>
-                            <TextBox Text="{Binding Ticket.Location.DisplayName, Mode=OneWay}" Style="{StaticResource SelectableText}"/>
+                            <Label Content="LOCATION" Style="{DynamicResource PropertyLabel}"/>
+                            <TextBox Text="{Binding Ticket.Location.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
                         </StackPanel>
                         <StackPanel MinWidth="150" Margin="0,2,28,2">
-                            <TextBlock Text="REQUEST TYPE" Style="{StaticResource FieldLabel}"/>
-                            <TextBox Text="{Binding Ticket.ProblemType.DisplayName, Mode=OneWay}" Style="{StaticResource SelectableText}"/>
+                            <Label Content="REQUEST TYPE" Style="{DynamicResource PropertyLabel}"/>
+                            <TextBox Text="{Binding Ticket.ProblemType.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
                         </StackPanel>
                         <StackPanel MinWidth="130" Margin="0,2,28,2">
-                            <TextBlock Text="REPORTED" Style="{StaticResource FieldLabel}"/>
-                            <TextBox Text="{Binding Ticket.ReportDateUtc, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}" Style="{StaticResource SelectableText}"/>
+                            <Label Content="REPORTED" Style="{DynamicResource PropertyLabel}"/>
+                            <TextBox Text="{Binding Ticket.ReportDateUtc, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
                         </StackPanel>
                         <StackPanel MinWidth="130" Margin="0,2,28,2">
-                            <TextBlock Text="UPDATED" Style="{StaticResource FieldLabel}"/>
-                            <TextBox Text="{Binding Ticket.EffectiveLastUpdated, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}" Style="{StaticResource SelectableText}"/>
+                            <Label Content="UPDATED" Style="{DynamicResource PropertyLabel}"/>
+                            <TextBox Text="{Binding Ticket.EffectiveLastUpdated, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
                         </StackPanel>
                     </WrapPanel>
                 </Border>
 
                 <!-- Request detail: hidden when it just repeats the subject -->
-                <Border BorderBrush="{StaticResource HeaderBrush}" BorderThickness="3,0,0,0"
-                        Background="{StaticResource Panel2Brush}" Padding="10,6" Margin="0,8,0,0"
+                <Border BorderBrush="{DynamicResource HeaderBrush}" BorderThickness="3,0,0,0"
+                        Background="{DynamicResource Panel2Brush}" Padding="10,6" Margin="0,8,0,0"
                         Visibility="{Binding HasDistinctDetail, Converter={StaticResource BoolToVisConverter}}">
                     <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto">
                         <RichTextBox beh:BbCode.Text="{Binding Ticket.DisplayDetail, Mode=OneWay}"
-                                     Style="{StaticResource SelectableRichText}"
-                                     Foreground="{StaticResource TextDimBrush}" FontSize="12"/>
+                                     Style="{DynamicResource SelectableRichText}"
+                                     Foreground="White" FontSize="12"/>
                     </ScrollViewer>
                 </Border>
 
@@ -92,7 +92,7 @@
                 <Grid Margin="0,12,0,0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="STATUS" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="STATUS" Style="{DynamicResource FieldLabel}"/>
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox ItemsSource="{Binding StatusTypes}" SelectedItem="{Binding SelectedStatus}"
                                           DisplayMemberPath="DisplayName" Width="150" Margin="0"/>
@@ -101,7 +101,7 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="PRIORITY" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="PRIORITY" Style="{DynamicResource FieldLabel}"/>
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox ItemsSource="{Binding PriorityTypes}" SelectedItem="{Binding SelectedPriority}"
                                           DisplayMemberPath="DisplayName" Width="130" Margin="0"/>
@@ -110,17 +110,17 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="TECH" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="TECH" Style="{DynamicResource FieldLabel}"/>
                             <ComboBox ItemsSource="{Binding Techs}" SelectedItem="{Binding SelectedTech}"
                                       DisplayMemberPath="ListDisplayName" Width="170" Margin="0"/>
                         </StackPanel>
                     </StackPanel>
-                    <Button Content="Save changes" Style="{StaticResource AccentButton}"
+                    <Button Content="Save changes" Style="{DynamicResource AccentButton}"
                             Command="{Binding SaveChangesCommand}" Padding="14,6"
                             HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                 </Grid>
 
-                <TextBlock Text="{Binding InfoMessage}" Foreground="{StaticResource HeaderBrush}" Margin="0,4,0,0"/>
+                <TextBlock Text="{Binding InfoMessage}" Foreground="{DynamicResource HeaderBrush}" Margin="0,4,0,0"/>
                 <TextBlock Text="{Binding ErrorMessage}" Foreground="#c0504d" Margin="0,4,0,0"/>
             </StackPanel>
         </Border>
@@ -147,21 +147,21 @@
                     <ItemsControl ItemsSource="{Binding Notes}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{StaticResource Panel2Brush}" BorderBrush="{StaticResource BorderBrushDim}"
+                                <Border Background="{DynamicResource Panel2Brush}" BorderBrush="{DynamicResource BorderBrushDim}"
                                         BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,8">
                                     <StackPanel>
                                         <DockPanel>
                                             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                                <TextBox Text="{Binding AuthorDisplay, Mode=OneWay}" Style="{StaticResource SelectableText}" FontWeight="SemiBold"/>
+                                                <TextBox Text="{Binding AuthorDisplay, Mode=OneWay}" Style="{DynamicResource SelectableText}" FontWeight="SemiBold"/>
                                                 <TextBlock Text=" (hidden)" Foreground="#c0504d"
                                                            Visibility="{Binding IsHidden, Converter={StaticResource BoolToVisConverter}}"/>
                                             </StackPanel>
                                             <TextBox Text="{Binding EffectiveDate, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}"
-                                                     Style="{StaticResource SelectableText}" Foreground="{StaticResource TextDimBrush}" FontSize="11"
+                                                     Style="{DynamicResource SelectableText}" Foreground="{DynamicResource TextDimBrush}" FontSize="11"
                                                      HorizontalAlignment="Right"/>
                                         </DockPanel>
                                         <RichTextBox beh:BbCode.Text="{Binding DisplayText, Mode=OneWay}"
-                                                     Style="{StaticResource SelectableRichText}" Margin="0,4,0,0" FontSize="12"/>
+                                                     Style="{DynamicResource SelectableRichText}" Margin="0,4,0,0" FontSize="12"/>
                                         <ItemsControl ItemsSource="{Binding Attachments}" Margin="0,6,0,0">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
@@ -182,9 +182,9 @@
                 </ScrollViewer>
 
                 <!-- Ticket-level attachments -->
-                <Border Grid.Row="1" Background="{StaticResource Panel2Brush}" CornerRadius="4" Padding="10" Margin="0,4,10,0">
+                <Border Grid.Row="1" Background="{DynamicResource Panel2Brush}" CornerRadius="4" Padding="10" Margin="0,4,10,0">
                     <StackPanel>
-                        <TextBlock Text="Ticket attachments" Style="{StaticResource SubHeaderText}" FontSize="12"/>
+                        <TextBlock Text="Ticket attachments" Style="{DynamicResource SubHeaderText}" FontSize="12"/>
                         <ItemsControl ItemsSource="{Binding Ticket.Attachments}" Margin="0,6,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -202,7 +202,7 @@
             </Grid>
 
             <!-- Reply panel -->
-            <Border Grid.Column="1" Background="{StaticResource PanelBrush}" CornerRadius="4" Padding="12">
+            <Border Grid.Column="1" Background="{DynamicResource PanelBrush}" CornerRadius="4" Padding="12">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -213,7 +213,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <DockPanel>
-                        <TextBlock Text="Reply (tech note)" Style="{StaticResource SubHeaderText}" DockPanel.Dock="Left"/>
+                        <TextBlock Text="Reply (tech note)" Style="{DynamicResource SubHeaderText}" DockPanel.Dock="Left"/>
                         <views:BbCodeToolbar Target="{Binding ElementName=ReplyBox}" DockPanel.Dock="Right"
                                              HorizontalAlignment="Right"/>
                     </DockPanel>
@@ -259,7 +259,7 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource Panel2Brush}" BorderBrush="{StaticResource BorderBrushDim}"
+                                    <Border Background="{DynamicResource Panel2Brush}" BorderBrush="{DynamicResource BorderBrushDim}"
                                             BorderThickness="1" CornerRadius="3" Padding="6,1" Margin="0,0,4,2">
                                         <DockPanel>
                                             <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="10"
@@ -286,7 +286,7 @@
                                                 Background="Transparent" BorderThickness="0"
                                                 Command="{Binding DataContext.RemoveReplyAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                 CommandParameter="{Binding}"/>
-                                        <TextBlock Text="{Binding}" Style="{StaticResource DimText}" FontSize="12"
+                                        <TextBlock Text="{Binding}" Style="{DynamicResource DimText}" FontSize="12"
                                                    TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
                                     </DockPanel>
                                 </DataTemplate>
@@ -295,7 +295,7 @@
                     </StackPanel>
 
                     <Grid Grid.Row="5">
-                        <Button Content="Add note" Style="{StaticResource AccentButton}"
+                        <Button Content="Add note" Style="{DynamicResource AccentButton}"
                                 Command="{Binding ReplyCommand}" Padding="12,5" HorizontalAlignment="Right"/>
                     </Grid>
                 </Grid>

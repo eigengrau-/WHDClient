@@ -1,12 +1,19 @@
 <Application x:Class="WHDClient.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:conv="clr-namespace:WHDClient.Converters">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/DarkTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <!-- Font-size scale (overridden live by ThemeService) -->
+            <sys:Double x:Key="AppFontSize">14</sys:Double>
+            <sys:Double x:Key="HeaderFontSize">20</sys:Double>
+            <sys:Double x:Key="SubHeaderFontSize">14</sys:Double>
+            <sys:Double x:Key="DimFontSize">11</sys:Double>
+            <sys:Double x:Key="FieldFontSize">10</sys:Double>
             <conv:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <conv:BoolToVisConverter x:Key="BoolToVisConverter"/>
             <conv:NullToVisConverter x:Key="NullToVisConverter"/>

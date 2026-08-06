@@ -28,6 +28,10 @@ public class AppSettings
     public bool NotifyAssignedToMe { get; set; } = true;
     public bool NotifyMyTicketUpdated { get; set; } = true;
     public bool NotifyNewMatching { get; set; } = true;
+    /// <summary>Theme name ("Dark" or "Light").</summary>
+    public string Theme { get; set; } = "Dark";
+    /// <summary>Base app font size in device-independent pixels.</summary>
+    public double FontSize { get; set; } = 14;
     public List<SavedFilter> SavedFilters { get; set; } = new();
     /// <summary>Ticket ids the user has bookmarked.</summary>
     public List<int> BookmarkedTicketIds { get; set; } = new();

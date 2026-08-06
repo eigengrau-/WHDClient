@@ -4,7 +4,7 @@
              xmlns:views="clr-namespace:WHDClient.Views">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="16" Width="900" HorizontalAlignment="Left" MinWidth="520">
-            <TextBlock Text="Create ticket" Style="{StaticResource HeaderText}" Margin="0,0,0,10"/>
+            <TextBlock Text="Create ticket" Style="{DynamicResource HeaderText}" Margin="0,0,0,10"/>
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -62,7 +62,7 @@
                     <ComboBox x:Name="ClientCombo" ItemsSource="{Binding ClientResults}"
                               SelectedItem="{Binding SelectedClient}" DisplayMemberPath="DisplayName"
                               MaxDropDownHeight="300"/>
-                    <TextBlock Text="No Client" Style="{StaticResource DimText}" IsHitTestVisible="False"
+                    <TextBlock Text="No Client" Style="{DynamicResource DimText}" IsHitTestVisible="False"
                                VerticalAlignment="Center" Margin="10,0,0,0"
                                Visibility="{Binding SelectedClient, Converter={StaticResource NullToVisConverter}, ConverterParameter=invert}"/>
                 </Grid>
@@ -93,7 +93,7 @@
                                             Background="Transparent" BorderThickness="0"
                                             Command="{Binding DataContext.RemoveAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                             CommandParameter="{Binding}"/>
-                                    <TextBlock Text="{Binding}" Style="{StaticResource DimText}" FontSize="12"
+                                    <TextBlock Text="{Binding}" Style="{DynamicResource DimText}" FontSize="12"
                                                TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
                                 </DockPanel>
                             </DataTemplate>
@@ -104,7 +104,7 @@
 
             <CheckBox Content="Assign to me" IsChecked="{Binding AssignToMe}" Margin="0,8,0,0"/>
 
-            <Button Style="{StaticResource AccentButton}"
+            <Button Style="{DynamicResource AccentButton}"
                     AutomationProperties.Name="Create ticket"
                     Command="{Binding CreateCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                     Margin="0,14,0,0" Padding="16,8" HorizontalAlignment="Left">

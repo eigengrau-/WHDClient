@@ -29,6 +29,8 @@ public partial class SettingsViewModel : TabViewModelBase
         NotifyAssignedToMe = settings.Settings.NotifyAssignedToMe;
         NotifyMyTicketUpdated = settings.Settings.NotifyMyTicketUpdated;
         NotifyNewMatching = settings.Settings.NotifyNewMatching;
+        FontSize = settings.Settings.FontSize;
+        Theme = settings.Settings.Theme;
         HasRememberedKey = settings.GetApiKey() != null;
         CurrentUserText = $"Signed in as {session.CurrentTech?.DisplayName} ({session.CurrentTech?.Email ?? session.CurrentTech?.Username})";
     }
@@ -40,6 +42,8 @@ public partial class SettingsViewModel : TabViewModelBase
     [ObservableProperty] private bool _notifyAssignedToMe;
     [ObservableProperty] private bool _notifyMyTicketUpdated;
     [ObservableProperty] private bool _notifyNewMatching;
+    [ObservableProperty] private string _theme;
+    [ObservableProperty] private double _fontSize;
     [ObservableProperty] private bool _hasRememberedKey;
     [ObservableProperty] private string _currentUserText = "";
     [ObservableProperty] private string _savedMessage = "";
@@ -50,6 +54,27 @@ public partial class SettingsViewModel : TabViewModelBase
     public string CurrentVersionText => $"Version {UpdateService.CurrentVersion}";
 
     public ObservableCollection<SavedFilter> AlertFilters => new(_settings.Settings.SavedFilters);
+
+    /// <summary>Available theme names, shown in the Appearance section.</summary>
+    public string[] ThemeOptions { get; } = { ThemeService.DarkTheme, ThemeService.LightTheme };
+
+    partial void OnThemeChanged(string value)
+    {
+        if (!WhdSessionContext.IsDemoMode) _settings.Settings.Theme = value;
+        ThemeService.Apply(value, FontSize);
+    }
+
+    partial void OnFontSizeChanged(double value)
+    {
+        if (!WhdSessionContext.IsDemoMode) _settings.Settings.FontSize = value;
+        ThemeService.Apply(Theme, value);
+    }
+
+    [RelayCommand]
+    private void IncreaseFontSize() => FontSize = Math.Clamp(FontSize + 1, ThemeService.MinFontSize, ThemeService.MaxFontSize);
+
+    [RelayCommand]
+    private void DecreaseFontSize() => FontSize = Math.Clamp(FontSize - 1, ThemeService.MinFontSize, ThemeService.MaxFontSize);
 
     partial void OnServerUrlChanged(string value)
     {

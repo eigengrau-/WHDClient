@@ -19,16 +19,17 @@ public static class DarkTitleBar
 
     public static void Apply(Window window)
     {
+        bool dark = ThemeService.IsDark;
         if (window.IsLoaded)
-            ApplyCore(new WindowInteropHelper(window).Handle);
+            ApplyCore(new WindowInteropHelper(window).Handle, dark);
         else
-            window.SourceInitialized += (_, _) => ApplyCore(new WindowInteropHelper(window).Handle);
+            window.SourceInitialized += (_, _) => ApplyCore(new WindowInteropHelper(window).Handle, dark);
     }
 
-    private static void ApplyCore(IntPtr hwnd)
+    private static void ApplyCore(IntPtr hwnd, bool dark)
     {
         if (hwnd == IntPtr.Zero) return;
-        int useDark = 1;
+        int useDark = dark ? 1 : 0;
         if (DwmSetWindowAttribute(hwnd, DwmwaUseImmersiveDarkMode, ref useDark, sizeof(int)) != 0)
             DwmSetWindowAttribute(hwnd, DwmwaUseImmersiveDarkModeOld, ref useDark, sizeof(int));
     }

@@ -86,6 +86,10 @@ public partial class App : Application
             settings.Load();
             Log($"settings loaded; hasKey={settings.GetApiKey() != null}");
 
+            // Apply the saved theme/font before any window is created so the first paint is correct.
+            ThemeService.Apply(settings.Settings.Theme, settings.Settings.FontSize);
+            Log($"theme={ThemeService.CurrentTheme} fontSize={ThemeService.CurrentFontSize}");
+
             // Demo mode: replace anything user-specific in memory (Save is a no-op in demo).
             if (WhdSessionContext.IsDemoMode)
             {

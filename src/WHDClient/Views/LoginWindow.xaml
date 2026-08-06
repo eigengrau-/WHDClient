@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="WHD Client — Sign In" Width="440" Height="490"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
-        Background="{StaticResource BgBrush}">
+        Background="{DynamicResource BgBrush}">
     <Grid Margin="36">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -14,9 +14,9 @@
             <StackPanel Orientation="Horizontal">
                 <Image Source="pack://application:,,,/Assets/life-preserver.png"
                        Width="40" Height="40" Margin="0,0,10,0"/>
-                <TextBlock Text="WHD Client" Style="{StaticResource HeaderText}" FontSize="28" VerticalAlignment="Center"/>
+                <TextBlock Text="WHD Client" Style="{DynamicResource HeaderText}" FontSize="28" VerticalAlignment="Center"/>
             </StackPanel>
-            <TextBlock Text="Web Help Desk monitoring client" Style="{StaticResource DimText}" Margin="0,4,0,0"/>
+            <TextBlock Text="Web Help Desk monitoring client" Style="{DynamicResource DimText}" Margin="0,4,0,0"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center">
@@ -25,7 +25,7 @@
 
             <TextBlock Text="Tech API key" Margin="0,14,0,4"/>
             <PasswordBox x:Name="ApiKeyBox" PasswordChanged="ApiKeyBox_PasswordChanged"/>
-            <TextBlock Style="{StaticResource DimText}" Margin="0,4,0,0">
+            <TextBlock Style="{DynamicResource DimText}" Margin="0,4,0,0">
                 Get your key:
                 <Hyperlink Command="{Binding OpenApiKeyPageCommand}">
                     WHD → Setup → Techs → My Account → API Key
@@ -35,7 +35,7 @@
             <CheckBox Content="Remember my key on this machine (encrypted)"
                       IsChecked="{Binding RememberKey}" Margin="0,14,0,0"/>
 
-            <Button Style="{StaticResource AccentButton}"
+            <Button Style="{DynamicResource AccentButton}"
                     AutomationProperties.Name="Sign in"
                     Command="{Binding SignInCommand}" IsDefault="True"
                     IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
