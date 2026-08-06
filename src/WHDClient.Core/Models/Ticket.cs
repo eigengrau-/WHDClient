@@ -44,6 +44,11 @@ public class Ticket
     [JsonIgnore]
     public DateTimeOffset? EffectiveLastUpdated => LastUpdatedUtc ?? LastUpdated;
 
+    /// <summary>True when the ticket carries a real subject (as opposed to a detail-derived fallback).</summary>
+    [JsonIgnore]
+    public bool HasSubject =>
+        !string.IsNullOrWhiteSpace(Subject) || !string.IsNullOrWhiteSpace(ShortSubject);
+
     [JsonIgnore]
     public string DisplaySubject
     {

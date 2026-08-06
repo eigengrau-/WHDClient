@@ -47,4 +47,22 @@ public class TicketDisplayTests
         var t = new Ticket { Id = 5 };
         Assert.Equal("(ticket 5)", t.DisplaySubject);
     }
+
+    [Fact]
+    public void HasSubject_True_WhenSubjectPresent()
+    {
+        Assert.True(new Ticket { Subject = "x" }.HasSubject);
+        Assert.True(new Ticket { ShortSubject = "x" }.HasSubject);
+    }
+
+    [Fact]
+    public void HasSubject_False_WhenOnlyDetailPresent()
+    {
+        var t = new Ticket { Detail = "<p>Some detail</p>" };
+        Assert.False(t.HasSubject);
+        // The detail still becomes the header subject (truncated if needed)…
+        Assert.NotEmpty(t.DisplaySubject);
+        // …so the ticket page shows the full detail alongside it.
+        Assert.NotEmpty(t.DisplayDetail);
+    }
 }

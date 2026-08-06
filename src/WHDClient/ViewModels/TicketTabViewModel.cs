@@ -194,6 +194,8 @@ public partial class TicketTabViewModel : TabViewModelBase
     {
         var detail = Normalize(t.DisplayDetail);
         if (detail.Length == 0) return false;
+        // No real subject: the header shows a truncated detail snippet, so always show the full detail.
+        if (!t.HasSubject) return true;
         var subject = Normalize(t.DisplaySubject).TrimEnd('.', '…', ' ');
         if (subject.Length == 0) return true;
         return !detail.StartsWith(subject, StringComparison.OrdinalIgnoreCase)
