@@ -238,6 +238,9 @@
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDim}"/>
         <Setter Property="Padding" Value="6,4"/>
+        <!-- Explicit DynamicResource so the drop-down popup (which does not inherit the
+             Window cascade) and the selection box follow the app-wide font scale too. -->
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="MinWidth" Value="120"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="Template">
@@ -308,6 +311,7 @@
     <Style TargetType="ComboBoxItem">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="Padding" Value="8,5"/>
         <Setter Property="Template">
             <Setter.Value>

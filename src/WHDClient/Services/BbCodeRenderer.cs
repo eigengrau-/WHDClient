@@ -49,7 +49,8 @@ public static class BbCodeRenderer
                     doc.Blocks.Add(new Paragraph(new Run(code.Text))
                     {
                         FontFamily = new FontFamily("Consolas"),
-                        FontSize = Resource<double>("FontSize12"),
+                        // No explicit FontSize: inherit from the host RichTextBox so the
+                        // whole rendered document follows the app-wide font scale live.
                         Background = Resource<Brush>("Panel2Brush"),
                         BorderBrush = Resource<Brush>("BorderBrushDim"),
                         BorderThickness = new Thickness(1),
