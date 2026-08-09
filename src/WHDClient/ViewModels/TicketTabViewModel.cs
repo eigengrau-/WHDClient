@@ -50,6 +50,11 @@ public partial class TicketTabViewModel : TabViewModelBase
     public ObservableCollection<PriorityType> PriorityTypes { get; } = new();
     public ObservableCollection<Tech> Techs { get; } = new();
 
+    // Request type: cascading picker. The full list is slow (~3s) so it loads lazily
+    // in the background, after the ticket renders, and pre-selects the current type.
+    public RequestTypePickerViewModel RequestTypePicker { get; } = new();
+    private bool _requestTypesLoading;
+
     // Reply
     [ObservableProperty] private string _replyText = "";
     [ObservableProperty] private bool _replyHidden;
@@ -139,6 +144,7 @@ public partial class TicketTabViewModel : TabViewModelBase
                 });
 
             await LoadLookupsAsync();
+            _ = LoadRequestTypesAsync();
 
             // Prefer the statuses valid for this ticket's process (enabledStatusTypes) — the
             // global /StatusTypes list omits approval-process statuses like "Approval Pending".
@@ -187,6 +193,33 @@ public partial class TicketTabViewModel : TabViewModelBase
         }
     }
 
+    /// <summary>
+    /// Loads the selectable request types (slow) and pre-selects the ticket's current type.
+    /// Runs in the background so opening a ticket never waits on the ~3s RequestTypes list.
+    /// The ticket's current type may be archived — then it is simply not in the picker and
+    /// the dropdown starts unselected (the type only changes when the user picks one).
+    /// </summary>
+    private async Task LoadRequestTypesAsync()
+    {
+        if (_requestTypesLoading || RequestTypePicker.IsLoaded) return;
+        _requestTypesLoading = true;
+        try
+        {
+            var types = await _session.Lookups.GetSelectableRequestTypesAsync();
+            RequestTypePicker.SetRequestTypes(types);
+            if (Ticket?.ProblemType != null)
+                RequestTypePicker.SetSelectedRequestType(Ticket.ProblemType.Id);
+        }
+        catch
+        {
+            // Non-fatal — the picker simply stays empty; saving still works for the other fields.
+        }
+        finally
+        {
+            _requestTypesLoading = false;
+        }
+    }
+
     private static string Truncate(string s, int n) => s.Length <= n ? s : s[..n] + "…";
 
     /// <summary>True when the detail says something the subject doesn't already say.</summary>
@@ -218,6 +251,12 @@ public partial class TicketTabViewModel : TabViewModelBase
                 payload["statustype"] = new EntityRef(SelectedStatus.Id, "StatusType");
             if (SelectedPriority != null && SelectedPriority.Id != Ticket.PriorityType?.Id)
                 payload["prioritytype"] = new EntityRef(SelectedPriority.Id, "PriorityType");
+            // Request type: only sent when the user picked a (selectable) type different from
+            // the current one. The ticket's current type may be archived — the picker starts
+            // unselected then and leaves the request type untouched.
+            if (RequestTypePicker.SelectedRequestType != null
+                && Ticket.ProblemType?.Id != RequestTypePicker.SelectedRequestType.Id)
+                payload["problemtype"] = new EntityRef(RequestTypePicker.SelectedRequestType.Id, "ProblemType");
             if (ReferenceEquals(SelectedTech, Tech.NotAssigned))
             {
                 if (Ticket.ClientTech != null)

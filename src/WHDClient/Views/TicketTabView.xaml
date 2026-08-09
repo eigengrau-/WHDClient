@@ -91,6 +91,10 @@
 
                 <!-- Editable fields -->
                 <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                         <StackPanel Margin="0,0,16,0">
                             <TextBlock Text="STATUS" Style="{DynamicResource FieldLabel}"/>
@@ -116,7 +120,13 @@
                                       DisplayMemberPath="ListDisplayName" Width="170" Margin="0"/>
                         </StackPanel>
                     </StackPanel>
-                    <Button Content="Save changes" Style="{DynamicResource AccentButton}"
+
+                    <!-- Request type: cascading picker, loads lazily after the page renders -->
+                    <StackPanel Grid.Row="1" Margin="0,10,0,0" VerticalAlignment="Bottom">
+                        <TextBlock Text="REQUEST TYPE" Style="{DynamicResource FieldLabel}"/>
+                        <views:RequestTypePicker DataContext="{Binding RequestTypePicker}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <Button Grid.Row="1" Content="Save changes" Style="{DynamicResource AccentButton}"
                             Command="{Binding SaveChangesCommand}" Padding="14,6"
                             HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                 </Grid>

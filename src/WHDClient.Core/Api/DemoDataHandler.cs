@@ -345,7 +345,7 @@ internal static class DemoData
     public static Tech TechById(int id) => Techs.FirstOrDefault(t => t.Id == id) ?? Techs[0];
     public static RequestType RequestTypeById(int id) => RequestTypes.FirstOrDefault(r => r.Id == id) ?? RequestTypes[0];
 
-    /// <summary>Applies an update payload to a ticket (demo: clientTech assign/unassign) and returns it.</summary>
+    /// <summary>Applies an update payload to a ticket (demo: clientTech, statustype, prioritytype, problemtype) and returns it.</summary>
     public static Ticket ApplyTicketUpdate(int id, string body)
     {
         var ticket = TicketById(id);
@@ -354,6 +354,14 @@ internal static class DemoData
         if (doc.RootElement.TryGetProperty("clientTech", out var tech))
         {
             ticket.ClientTech = tech.ValueKind == JsonValueKind.Null ? null : TechById(IntOf(tech));
+            ticket.LastUpdatedUtc = DateTimeOffset.UtcNow;
+            ticket.LastUpdated = DateTimeOffset.UtcNow;
+            ticket.PrettyLastUpdated = "just now";
+        }
+        if (doc.RootElement.TryGetProperty("problemtype", out var pt) && IntOf(pt) > 0)
+        {
+            var reqType = RequestTypes.FirstOrDefault(r => r.Id == IntOf(pt));
+            if (reqType != null) ticket.ProblemType = reqType;
             ticket.LastUpdatedUtc = DateTimeOffset.UtcNow;
             ticket.LastUpdated = DateTimeOffset.UtcNow;
             ticket.PrettyLastUpdated = "just now";

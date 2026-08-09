@@ -30,6 +30,9 @@ public partial class RequestTypePickerViewModel : ObservableObject
 
     [ObservableProperty] private RequestType? _selectedRequestType;
 
+    /// <summary>True once the request type list has been populated.</summary>
+    public bool IsLoaded => _all.Count > 0;
+
     /// <summary>Loads the (selectable) request types and shows the root level.</summary>
     public void SetRequestTypes(IEnumerable<RequestType> all)
     {
