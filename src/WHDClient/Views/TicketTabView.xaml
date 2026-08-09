@@ -119,15 +119,15 @@
                             <ComboBox ItemsSource="{Binding Techs}" SelectedItem="{Binding SelectedTech}"
                                       DisplayMemberPath="ListDisplayName" Width="170" Margin="0"/>
                         </StackPanel>
+                        <StackPanel VerticalAlignment="Bottom">
+                            <TextBlock Text="REQUEST TYPE" Style="{DynamicResource FieldLabel}"/>
+                            <!-- Cascading picker, loads lazily after the page renders -->
+                            <views:RequestTypePicker DataContext="{Binding RequestTypePicker}" Margin="0"/>
+                        </StackPanel>
                     </StackPanel>
 
-                    <!-- Request type: cascading picker, loads lazily after the page renders -->
-                    <StackPanel Grid.Row="1" Margin="0,10,0,0" VerticalAlignment="Bottom">
-                        <TextBlock Text="REQUEST TYPE" Style="{DynamicResource FieldLabel}"/>
-                        <views:RequestTypePicker DataContext="{Binding RequestTypePicker}" Margin="0,2,0,0"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom"
-                                HorizontalAlignment="Right">
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                                VerticalAlignment="Center" Margin="0,8,0,0">
                         <CheckBox Content="Send update email" IsChecked="{Binding SendUpdateEmail}"
                                   ToolTip="When unchecked, the client and tech are not emailed about these changes"
                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
@@ -149,6 +149,7 @@
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -218,8 +219,16 @@
                 </Border>
             </Grid>
 
+            <!-- Vertical splitter: drag to balance the notes timeline against the reply editor -->
+            <GridSplitter Grid.Column="1" Width="8" Margin="0,0,4,0" HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"
+                          Background="{DynamicResource BorderBrushDim}" Cursor="SizeWE"
+                          ToolTip="Drag to resize the notes/reply columns"
+                          AutomationProperties.Name="Resize notes/reply split"/>
+
             <!-- Reply panel -->
-            <Border Grid.Column="1" Background="{DynamicResource PanelBrush}" CornerRadius="4" Padding="12">
+            <Border Grid.Column="2" Background="{DynamicResource PanelBrush}" CornerRadius="4" Padding="12">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -239,7 +248,8 @@
                          controls row below are star-sized so the splitter can grow OR shrink it. -->
                     <GridSplitter Grid.Row="2" Height="8" HorizontalAlignment="Stretch" Margin="0,2"
                                   ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
-                                  Background="Transparent" Cursor="SizeNS"
+                                  Background="{DynamicResource BorderBrushDim}" Cursor="SizeNS"
+                                  ToolTip="Drag to resize the reply box"
                                   AutomationProperties.Name="Resize reply box"/>
                     <StackPanel Grid.Row="3" VerticalAlignment="Top">
                         <WrapPanel>
