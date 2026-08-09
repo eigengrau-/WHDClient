@@ -38,13 +38,16 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel x:Name="SidebarHeaderContent" Margin="16,20,16,10">
-                        <StackPanel Orientation="Horizontal">
+                    <StackPanel x:Name="SidebarHeaderContent" Margin="16,20,12,10">
+                        <!-- DockPanel lets the title trim instead of overflowing under the toggle button -->
+                        <DockPanel>
                             <Image Source="pack://application:,,,/Assets/life-preserver.png"
-                                   Width="26" Height="26" Margin="0,0,8,0"/>
-                            <TextBlock Text="WHD Client" Style="{DynamicResource HeaderText}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding UserDisplay}" Style="{DynamicResource DimText}" Margin="0,4,0,0"/>
+                                   Width="26" Height="26" Margin="0,0,8,0" DockPanel.Dock="Left"/>
+                            <TextBlock Text="WHD Client" Style="{DynamicResource HeaderText}" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </DockPanel>
+                        <TextBlock Text="{Binding UserDisplay}" Style="{DynamicResource DimText}" Margin="0,4,0,0"
+                                   TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                     <ToggleButton Grid.Column="1" x:Name="SidebarToggle" VerticalAlignment="Top"
                                   Margin="0,16,8,0" Padding="5,2" Background="Transparent" BorderThickness="0"
@@ -169,7 +172,8 @@
                         </Border>
                     </Popup>
 
-                    <TextBlock Text="{Binding StatusText}" Style="{DynamicResource DimText}" Margin="4,10,0,4"/>
+                    <TextBlock Text="{Binding StatusText}" Style="{DynamicResource DimText}" Margin="4,10,4,4"
+                               TextWrapping="Wrap"/>
                     <Button Command="{Binding SignOutCommand}" AutomationProperties.Name="Sign out" HorizontalContentAlignment="Left">
                         <StackPanel Orientation="Horizontal">
                              <Image Source="pack://application:,,,/Assets/icons/sign-out.png" Width="14" Height="14" Margin="0,0,8,0" beh:IconTint.Tint="{DynamicResource TextBrush}"/>
