@@ -38,19 +38,19 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel x:Name="SidebarHeaderContent" Margin="16,20,12,10">
-                        <!-- DockPanel lets the title trim instead of overflowing under the toggle button -->
+                    <StackPanel x:Name="SidebarHeaderContent" Margin="12,20,8,10">
+                        <!-- DockPanel keeps the title inside its column (never under the toggle);
+                             the title is never trimmed so it always displays in full. -->
                         <DockPanel>
                             <Image Source="pack://application:,,,/Assets/life-preserver.png"
                                    Width="26" Height="26" Margin="0,0,8,0" DockPanel.Dock="Left"/>
-                            <TextBlock Text="WHD Client" Style="{DynamicResource HeaderText}" VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="WHD Client" Style="{DynamicResource HeaderText}" VerticalAlignment="Center"/>
                         </DockPanel>
                         <TextBlock Text="{Binding UserDisplay}" Style="{DynamicResource DimText}" Margin="0,4,0,0"
                                    TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                     <ToggleButton Grid.Column="1" x:Name="SidebarToggle" VerticalAlignment="Top"
-                                  Margin="0,16,8,0" Padding="5,2" Background="Transparent" BorderThickness="0"
+                                  Margin="0,16,4,0" Padding="5,2" Background="Transparent" BorderThickness="0"
                                   ToolTip="Collapse sidebar" AutomationProperties.Name="Collapse sidebar"
                                   Checked="SidebarToggle_Checked" Unchecked="SidebarToggle_Unchecked">
                         <TextBlock x:Name="SidebarToggleGlyph" Text="❮" FontSize="{DynamicResource FontSize12}"/>
