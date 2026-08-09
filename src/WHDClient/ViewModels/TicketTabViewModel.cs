@@ -46,6 +46,12 @@ public partial class TicketTabViewModel : TabViewModelBase
     [ObservableProperty] private PriorityType? _selectedPriority;
     [ObservableProperty] private Tech? _selectedTech;
 
+    /// <summary>
+    /// When unchecked, saving field changes sends no update email to the client/tech
+    /// (the update payload carries sendEmail=false).
+    /// </summary>
+    [ObservableProperty] private bool _sendUpdateEmail = true;
+
     public ObservableCollection<StatusType> StatusTypes { get; } = new();
     public ObservableCollection<PriorityType> PriorityTypes { get; } = new();
     public ObservableCollection<Tech> Techs { get; } = new();
@@ -264,6 +270,12 @@ public partial class TicketTabViewModel : TabViewModelBase
             }
             else if (SelectedTech != null && SelectedTech.Id != Ticket.ClientTech?.Id)
                 payload["clientTech"] = new EntityRef(SelectedTech.Id, "Tech");
+
+            // "Send update email" unchecked suppresses the client/tech notification on this save.
+            // sendEmail only appears in the payload when emails are NOT wanted, so an ordinary
+            // save keeps the server's default behavior exactly as before.
+            if (!SendUpdateEmail)
+                payload["sendEmail"] = false;
 
             if (payload.Count == 0)
             {

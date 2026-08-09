@@ -126,9 +126,14 @@
                         <TextBlock Text="REQUEST TYPE" Style="{DynamicResource FieldLabel}"/>
                         <views:RequestTypePicker DataContext="{Binding RequestTypePicker}" Margin="0,2,0,0"/>
                     </StackPanel>
-                    <Button Grid.Row="1" Content="Save changes" Style="{DynamicResource AccentButton}"
-                            Command="{Binding SaveChangesCommand}" Padding="14,6"
-                            HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom"
+                                HorizontalAlignment="Right">
+                        <CheckBox Content="Send update email" IsChecked="{Binding SendUpdateEmail}"
+                                  ToolTip="When unchecked, the client and tech are not emailed about these changes"
+                                  VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <Button Content="Save changes" Style="{DynamicResource AccentButton}"
+                                Command="{Binding SaveChangesCommand}" Padding="14,6"/>
+                    </StackPanel>
                 </Grid>
 
                 <TextBlock Text="{Binding InfoMessage}" Foreground="{DynamicResource HeaderBrush}" Margin="0,4,0,0"/>
