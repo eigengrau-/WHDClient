@@ -64,7 +64,9 @@
     <Style x:Key="PropertyBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
         <Setter Property="TextAlignment" Value="Center"/>
         <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="TextWrapping" Value="Wrap"/>
+        <!-- NoWrap + no fixed width: the box sizes to its content, so long values
+             (e.g. school names) are shown in full instead of wrapping and clipping. -->
+        <Setter Property="TextWrapping" Value="NoWrap"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Height" Value="24"/>

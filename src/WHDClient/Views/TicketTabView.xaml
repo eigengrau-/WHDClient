@@ -57,12 +57,12 @@
                         <StackPanel Orientation="Horizontal" Margin="0,1,22,1">
                             <Label Content="CLIENT" Style="{DynamicResource PropertyLabel}" VerticalAlignment="Center"/>
                             <TextBox Text="{Binding Ticket.ClientReporter.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"
-                                     Width="170" Margin="6,0,0,0"/>
+                                     MinWidth="140" Margin="6,0,0,0"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,1,22,1">
                             <Label Content="LOCATION" Style="{DynamicResource PropertyLabel}" VerticalAlignment="Center"/>
                             <TextBox Text="{Binding Ticket.Location.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"
-                                     Width="170" Margin="6,0,0,0"/>
+                                     MinWidth="140" Margin="6,0,0,0"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,1,22,1">
                             <Label Content="REPORTED" Style="{DynamicResource PropertyLabel}" VerticalAlignment="Center"/>
@@ -237,7 +237,9 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="2*"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <!-- Bottom controls (checkboxes/Cc/files/Add note) must never be clipped,
+                             even at Large font: the star share floors at their content height. -->
+                        <RowDefinition Height="*" MinHeight="175"/>
                     </Grid.RowDefinitions>
                     <DockPanel>
                         <TextBlock Text="Reply (tech note)" Style="{DynamicResource SubHeaderText}" DockPanel.Dock="Left"/>
