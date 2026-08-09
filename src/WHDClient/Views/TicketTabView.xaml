@@ -85,7 +85,7 @@
                                   beh:ScrollWheelSpeed.PixelsPerNotch="24">
                         <RichTextBox beh:BbCode.Text="{Binding Ticket.DisplayDetail, Mode=OneWay}"
                                      Style="{DynamicResource SelectableRichText}"
-                                     FontSize="{DynamicResource FontSize12}"/>
+                                     FontSize="{DynamicResource AppFontSize}"/>
                     </ScrollViewer>
                 </Border>
 
@@ -151,7 +151,7 @@
         <!-- Body: notes + attachments | reply -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -182,7 +182,7 @@
                                                      HorizontalAlignment="Right"/>
                                         </DockPanel>
                                         <RichTextBox beh:BbCode.Text="{Binding DisplayText, Mode=OneWay}"
-                                                     Style="{DynamicResource SelectableRichText}" Margin="0,4,0,0" FontSize="{DynamicResource FontSize12}"/>
+                                                     Style="{DynamicResource SelectableRichText}" Margin="0,4,0,0" FontSize="{DynamicResource AppFontSize}"/>
                                         <ItemsControl ItemsSource="{Binding Attachments}" Margin="0,6,0,0">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
