@@ -225,6 +225,7 @@
     <Style TargetType="PasswordBox">
         <Setter Property="Background" Value="{StaticResource Panel2Brush}"/>
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDim}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="6,4"/>
@@ -369,6 +370,7 @@
     <Style TargetType="DataGrid">
         <Setter Property="Background" Value="{StaticResource Panel2Brush}"/>
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="RowBackground" Value="{StaticResource Panel2Brush}"/>
         <Setter Property="AlternatingRowBackground" Value="#e4e8ea"/>
         <Setter Property="GridLinesVisibility" Value="Horizontal"/>
@@ -384,6 +386,7 @@
     <Style TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource HeaderBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Padding" Value="8,6"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDim}"/>
@@ -443,6 +446,7 @@
     </Style>
     <Style TargetType="DataGridCell">
         <Setter Property="Padding" Value="6,3"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -468,10 +472,12 @@
     <Style TargetType="ListBox">
         <Setter Property="Background" Value="{StaticResource Panel2Brush}"/>
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDim}"/>
     </Style>
     <Style TargetType="ListBoxItem">
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="Padding" Value="8,5"/>
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
@@ -487,16 +493,19 @@
     <!-- ScrollViewer / GroupBox / Expander -->
     <Style TargetType="GroupBox">
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDim}"/>
     </Style>
     <Style TargetType="Expander">
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
     </Style>
 
     <!-- ToolTip -->
     <Style TargetType="ToolTip">
         <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="BorderBrush" Value="{StaticResource HeaderBrush}"/>
     </Style>
 
@@ -556,6 +565,7 @@
     <Style TargetType="DatePicker">
         <Setter Property="Background" Value="{StaticResource Panel2Brush}"/>
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource AppFontSize}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDim}"/>
         <Setter Property="Template">
             <Setter.Value>
