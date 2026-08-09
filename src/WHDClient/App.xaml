@@ -29,6 +29,7 @@
             <conv:BoolToVisConverter x:Key="BoolToVisConverter"/>
             <conv:NullToVisConverter x:Key="NullToVisConverter"/>
             <conv:PositiveIntToVisConverter x:Key="PositiveIntToVisConverter"/>
+            <conv:StringToVisConverter x:Key="StringToVisConverter"/>
             <conv:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
             <conv:PriorityToBrushConverter x:Key="PriorityToBrushConverter"/>
             <conv:DateTimeLocalConverter x:Key="DateTimeLocalConverter"/>

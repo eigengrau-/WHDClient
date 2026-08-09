@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Background="{DynamicResource PanelBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,6">
+        <Border Background="{DynamicResource PanelBrush}" CornerRadius="4" Padding="12,8" Margin="0,0,0,6">
             <StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -19,7 +19,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBox Style="{DynamicResource SelectableText}" VerticalAlignment="Center"
-                             Foreground="{DynamicResource HeaderBrush}" FontSize="{DynamicResource FontSize20}" FontWeight="SemiBold">
+                             Foreground="{DynamicResource HeaderBrush}" FontSize="{DynamicResource FontSize18}" FontWeight="SemiBold">
                         <TextBox.Text>
                             <MultiBinding StringFormat="#{0} {1}">
                                 <Binding Path="Ticket.Id" Mode="OneWay"/>
@@ -51,37 +51,37 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- Ticket meta: label-above-value fields in a card -->
-                <Border Background="{DynamicResource Panel2Brush}" CornerRadius="4" Padding="12,8" Margin="0,10,0,0">
+                <!-- Ticket meta: compact inline label + value fields (no REQUEST TYPE here — it is set in the fields below) -->
+                <Border Background="{DynamicResource Panel2Brush}" CornerRadius="4" Padding="10,6" Margin="0,8,0,0">
                     <WrapPanel>
-                        <StackPanel MinWidth="150" Margin="0,2,28,2">
-                            <Label Content="CLIENT" Style="{DynamicResource PropertyLabel}"/>
-                            <TextBox Text="{Binding Ticket.ClientReporter.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,1,22,1">
+                            <Label Content="CLIENT" Style="{DynamicResource PropertyLabel}" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding Ticket.ClientReporter.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"
+                                     Width="170" Margin="6,0,0,0"/>
                         </StackPanel>
-                        <StackPanel MinWidth="150" Margin="0,2,28,2">
-                            <Label Content="LOCATION" Style="{DynamicResource PropertyLabel}"/>
-                            <TextBox Text="{Binding Ticket.Location.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,1,22,1">
+                            <Label Content="LOCATION" Style="{DynamicResource PropertyLabel}" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding Ticket.Location.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"
+                                     Width="170" Margin="6,0,0,0"/>
                         </StackPanel>
-                        <StackPanel MinWidth="150" Margin="0,2,28,2">
-                            <Label Content="REQUEST TYPE" Style="{DynamicResource PropertyLabel}"/>
-                            <TextBox Text="{Binding Ticket.ProblemType.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,1,22,1">
+                            <Label Content="REPORTED" Style="{DynamicResource PropertyLabel}" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding Ticket.ReportDateUtc, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}"
+                                     Style="{DynamicResource PropertyBox}" Width="150" Margin="6,0,0,0"/>
                         </StackPanel>
-                        <StackPanel MinWidth="130" Margin="0,2,28,2">
-                            <Label Content="REPORTED" Style="{DynamicResource PropertyLabel}"/>
-                            <TextBox Text="{Binding Ticket.ReportDateUtc, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
-                        </StackPanel>
-                        <StackPanel MinWidth="130" Margin="0,2,28,2">
-                            <Label Content="UPDATED" Style="{DynamicResource PropertyLabel}"/>
-                            <TextBox Text="{Binding Ticket.EffectiveLastUpdated, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}" Style="{DynamicResource PropertyBox}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,1,22,1">
+                            <Label Content="UPDATED" Style="{DynamicResource PropertyLabel}" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding Ticket.EffectiveLastUpdated, Converter={StaticResource DateTimeLocalConverter}, Mode=OneWay}"
+                                     Style="{DynamicResource PropertyBox}" Width="150" Margin="6,0,0,0"/>
                         </StackPanel>
                     </WrapPanel>
                 </Border>
 
                 <!-- Request detail: hidden when it just repeats the subject -->
                 <Border BorderBrush="{DynamicResource HeaderBrush}" BorderThickness="3,0,0,0"
-                        Background="{DynamicResource Panel2Brush}" Padding="10,6" Margin="0,8,0,0"
+                        Background="{DynamicResource Panel2Brush}" Padding="10,5" Margin="0,6,0,0"
                         Visibility="{Binding HasDistinctDetail, Converter={StaticResource BoolToVisConverter}}">
-                    <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto"
+                    <ScrollViewer MaxHeight="130" VerticalScrollBarVisibility="Auto"
                                   beh:ScrollWheelSpeed.PixelsPerNotch="24">
                         <RichTextBox beh:BbCode.Text="{Binding Ticket.DisplayDetail, Mode=OneWay}"
                                      Style="{DynamicResource SelectableRichText}"
@@ -90,7 +90,7 @@
                 </Border>
 
                 <!-- Editable fields -->
-                <Grid Margin="0,12,0,0">
+                <Grid Margin="0,8,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -127,7 +127,7 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"
-                                VerticalAlignment="Center" Margin="0,8,0,0">
+                                VerticalAlignment="Center" Margin="0,6,0,0">
                         <CheckBox Content="Send update email" IsChecked="{Binding SendUpdateEmail}"
                                   ToolTip="When unchecked, the client and tech are not emailed about these changes"
                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
@@ -136,8 +136,11 @@
                     </StackPanel>
                 </Grid>
 
-                <TextBlock Text="{Binding InfoMessage}" Foreground="{DynamicResource HeaderBrush}" Margin="0,4,0,0"/>
-                <TextBlock Text="{Binding ErrorMessage}" Foreground="#c0504d" Margin="0,4,0,0"/>
+                <!-- Status/error lines: collapsed (no vertical space) until they have content -->
+                <TextBlock Text="{Binding InfoMessage}" Foreground="{DynamicResource HeaderBrush}" Margin="0,4,0,0"
+                           Visibility="{Binding InfoMessage, Converter={StaticResource StringToVisConverter}}"/>
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="#c0504d" Margin="0,4,0,0"
+                           Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisConverter}}"/>
             </StackPanel>
         </Border>
 
