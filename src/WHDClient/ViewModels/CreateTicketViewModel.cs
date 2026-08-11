@@ -39,6 +39,13 @@ public partial class CreateTicketViewModel : TabViewModelBase
     [ObservableProperty] private Tech? _selectedTech;
     [ObservableProperty] private bool _assignToMe = true;
 
+    /// <summary>Whether the selected request type requires a subject (WHD hides the subject field on some types).</summary>
+    [ObservableProperty] private bool _isSubjectRequired = true;
+
+    public string SubjectLabel => IsSubjectRequired ? "Subject *" : "Subject";
+
+    partial void OnIsSubjectRequiredChanged(bool value) => OnPropertyChanged(nameof(SubjectLabel));
+
     // Guards re-entrancy while "Assign to me" and the Tech dropdown keep each other in sync.
     private bool _syncingTech;
 
@@ -70,6 +77,11 @@ public partial class CreateTicketViewModel : TabViewModelBase
         _onCreated = onCreated;
         Header = "New Ticket";
         IconSource = "pack://application:,,,/Assets/icons/new-ticket.png";
+        RequestTypePicker.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(RequestTypePickerViewModel.SelectedRequestType))
+                IsSubjectRequired = RequestTypePicker.SelectedRequestType?.HideSubject != true;
+        };
         _ = LoadAsync();
     }
 
@@ -82,6 +94,9 @@ public partial class CreateTicketViewModel : TabViewModelBase
             foreach (var p in await _session.Lookups.GetPriorityTypesAsync()) PriorityTypes.Add(p);
             foreach (var l in await _session.Lookups.GetLocationsAsync()) Locations.Add(l);
             foreach (var t in await _session.Lookups.GetActiveTechsAsync()) Techs.Add(t);
+
+            SelectedPriority = PriorityTypes.FirstOrDefault(p =>
+                string.Equals(p.DisplayName, "Normal", StringComparison.OrdinalIgnoreCase));
 
             // "Assign to me" defaults on — reflect it in the Tech dropdown.
             if (AssignToMe) OnAssignToMeChanged(true);
@@ -166,7 +181,7 @@ public partial class CreateTicketViewModel : TabViewModelBase
     private async Task CreateAsync()
     {
         ErrorMessage = null;
-        if (string.IsNullOrWhiteSpace(Subject)) { ErrorMessage = "Subject is required."; return; }
+        if (IsSubjectRequired && string.IsNullOrWhiteSpace(Subject)) { ErrorMessage = "Subject is required."; return; }
         if (RequestTypePicker.SelectedRequestType == null) { ErrorMessage = "Request type is required."; return; }
         if (SelectedClient?.Id == null) { ErrorMessage = "Client is required — search and select a reporter."; return; }
 
@@ -175,7 +190,6 @@ public partial class CreateTicketViewModel : TabViewModelBase
         {
             var payload = new Dictionary<string, object?>
             {
-                ["subject"] = Subject.Trim(),
                 ["detail"] = Detail,
                 ["problemtype"] = new EntityRef(RequestTypePicker.SelectedRequestType!.Id, "ProblemType"),
                 ["reportDateUtc"] = DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'"),
@@ -183,6 +197,8 @@ public partial class CreateTicketViewModel : TabViewModelBase
                 // An explicitly chosen tech wins over the "assign to me" checkbox.
                 ["assignToCreatingTech"] = SelectedTech == null && AssignToMe
             };
+            // Blank subjects are omitted: types that hide the subject let the server derive it from the detail.
+            if (!string.IsNullOrWhiteSpace(Subject)) payload["subject"] = Subject.Trim();
             if (SelectedTech != null) payload["clientTech"] = new EntityRef(SelectedTech.Id, "Tech");
             if (SelectedClient?.Id != null) payload["clientReporter"] = new EntityRef(SelectedClient.Id, "Client");
             if (SelectedPriority != null) payload["prioritytype"] = new EntityRef(SelectedPriority.Id, "PriorityType");

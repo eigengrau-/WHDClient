@@ -86,6 +86,9 @@ public class RequestType
     [JsonPropertyName("fullName")] public string? FullName { get; set; }
     [JsonPropertyName("archived")] public bool Archived { get; set; }
     [JsonPropertyName("deleted")] public bool Deleted { get; set; }
+    /// <summary>WHD emits this as 0/1 with style=details. When set, tickets of this type
+    /// have no subject field — the subject is derived from the detail instead.</summary>
+    [JsonPropertyName("hideSubject")] public bool HideSubject { get; set; }
 
     /// <summary>Archived/deleted request types are kept for display on old tickets but must not be selectable.</summary>
     [JsonIgnore]

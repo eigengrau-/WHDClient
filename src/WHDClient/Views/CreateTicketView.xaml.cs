@@ -25,4 +25,9 @@ public partial class CreateTicketView : UserControl
         ClientCombo.Focus();
         ClientCombo.IsDropDownOpen = true;
     }
+
+    private void DetailResizeThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+    {
+        DetailBox.Height = Math.Max(DetailBox.MinHeight, DetailBox.ActualHeight + e.VerticalChange);
+    }
 }

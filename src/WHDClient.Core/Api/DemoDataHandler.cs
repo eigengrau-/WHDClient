@@ -138,7 +138,7 @@ internal static class DemoData
     public static readonly List<PriorityType> PriorityTypes = new()
     {
         new() { Id = 1, Type = "PriorityType", PriorityTypeName = "Low", DisplayOrder = 1 },
-        new() { Id = 2, Type = "PriorityType", PriorityTypeName = "Medium", DisplayOrder = 2 },
+        new() { Id = 2, Type = "PriorityType", PriorityTypeName = "Normal", DisplayOrder = 2 },
         new() { Id = 3, Type = "PriorityType", PriorityTypeName = "High", DisplayOrder = 3 },
         new() { Id = 4, Type = "PriorityType", PriorityTypeName = "Urgent", DisplayOrder = 4 },
     };
@@ -160,7 +160,7 @@ internal static class DemoData
         RT(112, "Distribution List Change", 110),
         RT(120, "Accounts", 100),
         RT(121, "New Account / Access", 120),
-        RT(122, "Password Reset", 120),
+        RT(122, "Password Reset", 120, hideSubject: true),
         RT(200, "Hardware"),
         RT(210, "Chromebooks", 200),
         RT(211, "Repair Request", 210),
@@ -177,7 +177,7 @@ internal static class DemoData
         RT(910, "[A] Line Move", 900, archived: true),
     };
 
-    private static RequestType RT(int id, string name, int? parent = null, bool archived = false)
+    private static RequestType RT(int id, string name, int? parent = null, bool archived = false, bool hideSubject = false)
         => new()
         {
             Id = id,
@@ -185,7 +185,8 @@ internal static class DemoData
             ProblemTypeName = name,
             DetailDisplayName = name,
             ParentId = parent,
-            Archived = archived
+            Archived = archived,
+            HideSubject = hideSubject
         };
 
     private record TicketSeed(
