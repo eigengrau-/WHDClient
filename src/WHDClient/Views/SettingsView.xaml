@@ -98,6 +98,20 @@
                                           Width="140" HorizontalAlignment="Left"/>
                             </StackPanel>
                         </Border>
+                        <Border Background="{DynamicResource PanelBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="Ticket list columns" Style="{DynamicResource SubHeaderText}"/>
+                                <TextBlock Text="Show or hide columns on all ticket lists. Drag column headers to reorder or edges to resize; the layout is remembered."
+                                           Style="{DynamicResource DimText}" Margin="0,4,0,4" TextWrapping="Wrap"/>
+                                <ItemsControl ItemsSource="{Binding ColumnToggles}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsVisible}" Margin="0,1"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
                         <Border Background="{DynamicResource PanelBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,0">
                             <StackPanel>
                                 <TextBlock Text="Sign-in" Style="{DynamicResource SubHeaderText}"/>

@@ -59,6 +59,9 @@ public class StringToVisConverter : IValueConverter
 public class StatusToBrushConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        => new System.Windows.Media.SolidColorBrush(ColorFor(value));
+
+    internal static System.Windows.Media.Color ColorFor(object value)
     {
         var s = (value as string ?? "").ToLowerInvariant();
         var color = s switch
@@ -75,8 +78,26 @@ public class StatusToBrushConverter : IValueConverter
             _ when s.Contains("project") => "#5e8ca0",     // link blue
             _ => "#535353"
         };
-        return new System.Windows.Media.SolidColorBrush(
-            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(color));
+        return (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(color);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+/// <summary>Translucent status tint for whole-row coloring on ticket grids; alpha-based, so it
+/// composes over both the dark and light row backgrounds.</summary>
+public class StatusToTintConverter : IValueConverter
+{
+    private const byte Alpha = 38;
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        var c = StatusToBrushConverter.ColorFor(value);
+        c.A = Alpha;
+        var brush = new System.Windows.Media.SolidColorBrush(c);
+        brush.Freeze();
+        return brush;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

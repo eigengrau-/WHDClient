@@ -31,6 +31,7 @@
             <conv:PositiveIntToVisConverter x:Key="PositiveIntToVisConverter"/>
             <conv:StringToVisConverter x:Key="StringToVisConverter"/>
             <conv:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
+            <conv:StatusToTintConverter x:Key="StatusToTintConverter"/>
             <conv:PriorityToBrushConverter x:Key="PriorityToBrushConverter"/>
             <conv:DateTimeLocalConverter x:Key="DateTimeLocalConverter"/>
         </ResourceDictionary>

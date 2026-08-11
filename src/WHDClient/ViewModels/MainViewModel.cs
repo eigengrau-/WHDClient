@@ -32,6 +32,7 @@ public partial class MainViewModel : ObservableObject
     private readonly PollingService _polling;
     private readonly NotificationService _notifications;
     private readonly UpdateService _updates;
+    private readonly GridLayoutService _gridLayout;
 
     public ObservableCollection<TabViewModelBase> Tabs { get; } = new();
 
@@ -51,13 +52,15 @@ public partial class MainViewModel : ObservableObject
     private BookmarksViewModel? _bookmarks;
 
     public MainViewModel(WhdSessionContext session, SettingsService settings,
-        PollingService polling, NotificationService notifications, UpdateService updates)
+        PollingService polling, NotificationService notifications, UpdateService updates,
+        GridLayoutService gridLayout)
     {
         _session = session;
         _settings = settings;
         _polling = polling;
         _notifications = notifications;
         _updates = updates;
+        _gridLayout = gridLayout;
 
         // Only My Tickets is a permanent tab; the other pages open on demand from the sidebar.
         _myTickets = new MyTicketsViewModel(_session, _settings, OpenTicket);
@@ -74,6 +77,20 @@ public partial class MainViewModel : ObservableObject
 
         // Silent update check on startup; alerts via the notification feed when newer exists.
         _ = CheckForUpdatesAsync();
+
+        // Restore the tabs that were open when the app was last closed.
+        foreach (var key in _settings.Settings.OpenTabs)
+        {
+            if (key.Equals("newticket", StringComparison.OrdinalIgnoreCase))
+                OpenNewTicketCommand.Execute(null);
+            else if (key.StartsWith("ticket:", StringComparison.OrdinalIgnoreCase)
+                     && int.TryParse(key[7..], out var tid))
+                OpenTicket(tid);
+            else
+                ShowPage(key);
+        }
+        var selected = Tabs.FirstOrDefault(t => TabKey(t) == _settings.Settings.SelectedTab);
+        if (selected != null) SelectedTab = selected;
 
         // Dev/test hook: WHD_START_PAGE=mine|search|queue|settings|newticket|ticket:<id>
         var startPage = Environment.GetEnvironmentVariable("WHD_START_PAGE");
@@ -121,6 +138,24 @@ public partial class MainViewModel : ObservableObject
         Tabs.Add(tab);
         SelectedTab = tab;
     }
+
+    /// <summary>Keys of all restorable tabs in display order; My Tickets is permanent and excluded.</summary>
+    public List<string> GetOpenTabKeys() =>
+        Tabs.Select(TabKey).Where(k => k != null).Select(k => k!).ToList();
+
+    public string? GetSelectedTabKey() => TabKey(SelectedTab);
+
+    private static string? TabKey(TabViewModelBase? tab) => tab switch
+    {
+        null or MyTicketsViewModel => null,
+        SearchViewModel => "search",
+        QueueViewModel => "queue",
+        BookmarksViewModel => "bookmarks",
+        SettingsViewModel => "settings",
+        CreateTicketViewModel => "newticket",
+        TicketTabViewModel t => $"ticket:{t.TicketId}",
+        _ => null
+    };
 
     private void OnBookmarkChanged()
     {
@@ -188,7 +223,7 @@ public partial class MainViewModel : ObservableObject
             "mine" => _myTickets,
             "search" => _search ??= new SearchViewModel(_session, _settings, OpenTicket),
             "queue" => _queue ??= new QueueViewModel(_session, _settings, OpenTicket),
-            "settings" => _settingsPage ??= new SettingsViewModel(_settings, _session, _updates, SignOut),
+            "settings" => _settingsPage ??= new SettingsViewModel(_settings, _session, _updates, SignOut, _gridLayout),
             "bookmarks" => _bookmarks ??= new BookmarksViewModel(_session, _settings, OpenTicket),
             _ => null
         };

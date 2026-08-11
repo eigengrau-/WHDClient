@@ -14,13 +14,17 @@ public partial class SettingsViewModel : TabViewModelBase
 
     public override bool IsClosable => true;
 
-    public SettingsViewModel(SettingsService settings, WhdSessionContext session, UpdateService updates, Action signOut)
+    public SettingsViewModel(SettingsService settings, WhdSessionContext session, UpdateService updates, Action signOut,
+        GridLayoutService gridLayout)
     {
         Header = "Settings";
         IconSource = "pack://application:,,,/Assets/icons/settings.png";
         _settings = settings;
         _updates = updates;
         _signOut = signOut;
+
+        foreach (var h in GridLayoutService.KnownHeaders)
+            ColumnToggles.Add(new ColumnToggleItem(h, gridLayout.IsColumnVisible(h), gridLayout));
 
         ServerUrl = WhdSessionContext.IsDemoMode ? DemoDataHandler.DemoServerUrl : settings.Settings.ServerUrl;
         PollIntervalSeconds = settings.Settings.PollIntervalSeconds;
@@ -54,6 +58,9 @@ public partial class SettingsViewModel : TabViewModelBase
     public string CurrentVersionText => $"Version {UpdateService.CurrentVersion}";
 
     public ObservableCollection<SavedFilter> AlertFilters => new(_settings.Settings.SavedFilters);
+
+    /// <summary>One checkbox per ticket-grid column (Settings > Ticket list columns).</summary>
+    public ObservableCollection<ColumnToggleItem> ColumnToggles { get; } = new();
 
     /// <summary>Available theme names, shown in the Appearance section.</summary>
     public string[] ThemeOptions { get; } = { ThemeService.DarkTheme, ThemeService.LightTheme };
@@ -149,4 +156,23 @@ public partial class SettingsViewModel : TabViewModelBase
 
     [RelayCommand]
     private void SignOut() => _signOut();
+}
+
+/// <summary>One row in Settings > Ticket list columns: a column header with a visibility checkbox.</summary>
+public partial class ColumnToggleItem : ObservableObject
+{
+    private readonly GridLayoutService _layout;
+
+    public string Name { get; }
+
+    [ObservableProperty] private bool _isVisible;
+
+    public ColumnToggleItem(string name, bool isVisible, GridLayoutService layout)
+    {
+        Name = name;
+        _layout = layout;
+        _isVisible = isVisible; // field assignment: don't fire the setter during init
+    }
+
+    partial void OnIsVisibleChanged(bool value) => _layout.SetColumnVisible(Name, value);
 }

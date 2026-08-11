@@ -50,6 +50,23 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>Persist grid column layouts, open tabs, and any unsaved settings before the window goes away.</summary>
+    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+    {
+        if (App.Services.GetService(typeof(GridLayoutService)) is GridLayoutService layout)
+            layout.CaptureAll();
+        if (App.Services.GetService(typeof(SettingsService)) is SettingsService settings)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                settings.Settings.OpenTabs = vm.GetOpenTabKeys();
+                settings.Settings.SelectedTab = vm.GetSelectedTabKey();
+            }
+            settings.Save();
+        }
+        base.OnClosing(e);
+    }
+
     private void Notification_Click(object sender, MouseButtonEventArgs e)
     {
         if (sender is FrameworkElement el && el.Tag is AppNotification notification && DataContext is MainViewModel vm)

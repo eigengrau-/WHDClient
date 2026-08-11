@@ -87,6 +87,7 @@ public partial class App : Application
             services.AddSingleton<PollingService>();
             services.AddSingleton<NotificationService>();
             services.AddSingleton<UpdateService>();
+            services.AddSingleton<GridLayoutService>();
             services.AddSingleton<MainViewModel>();
             services.AddTransient<LoginViewModel>();
             Services = services.BuildServiceProvider();

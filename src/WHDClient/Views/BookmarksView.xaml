@@ -23,12 +23,18 @@
             </StackPanel>
         </DockPanel>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Tickets}" MouseDoubleClick="Row_DoubleClick" Loaded="Grid_Loaded">
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Tickets}" MouseDoubleClick="Row_DoubleClick" Loaded="Grid_Loaded"
+                  beh:GridColumnPersistence.Key="Bookmarks">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                    <Setter Property="Background" Value="{Binding Status, Converter={StaticResource StatusToTintConverter}}"/>
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="60" ElementStyle="{DynamicResource CellText}"/>
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="3*" ElementStyle="{DynamicResource CellText}"/>
                 <DataGridTextColumn Header="Client" Binding="{Binding Client}" Width="*" ElementStyle="{DynamicResource CellText}"/>
-                <DataGridTemplateColumn Header="Status" Width="70" SortMemberPath="Status">
+                <DataGridTemplateColumn Header="Status" Width="SizeToHeader" SortMemberPath="Status">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Ellipse Width="12" Height="12" HorizontalAlignment="Center"
@@ -37,7 +43,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Priority" Width="70" SortMemberPath="Priority">
+                <DataGridTemplateColumn Header="Priority" Width="SizeToHeader" SortMemberPath="Priority">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Ellipse Width="12" Height="12" HorizontalAlignment="Center"
@@ -48,8 +54,8 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*" ElementStyle="{DynamicResource CellText}"/>
                 <DataGridTextColumn Header="Tech" Binding="{Binding Tech}" Width="*" ElementStyle="{DynamicResource CellText}"/>
-                <DataGridTextColumn Header="Reported" Binding="{Binding ReportDate}" Width="110" ElementStyle="{DynamicResource CellText}"/>
                 <DataGridTextColumn Header="Updated" Binding="{Binding LastUpdated}" Width="110" ElementStyle="{DynamicResource CellText}"/>
+                <DataGridTextColumn Header="Reported" Binding="{Binding ReportDate}" Width="110" ElementStyle="{DynamicResource CellText}"/>
                 <DataGridTemplateColumn Header="" Width="50" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
