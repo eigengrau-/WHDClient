@@ -38,6 +38,14 @@ public class Ticket
     [JsonPropertyName("latestNote")] public TicketNote? LatestNote { get; set; }
     [JsonPropertyName("attachments")] public List<TicketAttachment>? Attachments { get; set; }
 
+    /// <summary>
+    /// Note stubs embedded in the style=details ticket response. Unlike the /TicketNotes
+    /// endpoint (which omits attachments entirely), these carry their attachments — the
+    /// only way the REST API exposes note attachments. Merged into the full notes by the
+    /// ticket tab after load.
+    /// </summary>
+    [JsonPropertyName("notes")] public List<TicketNote>? EmbeddedNotes { get; set; }
+
     [JsonPropertyName("deleted")] public int? Deleted { get; set; }
 
     /// <summary>Best-effort UTC last-updated stamp used for change detection.</summary>

@@ -134,6 +134,18 @@ public partial class TicketTabViewModel : TabViewModelBase
             HasDistinctDetail = ComputeHasDistinctDetail(ticket);
 
             var notes = await notesTask;
+            // /TicketNotes omits attachments entirely; the style=details ticket response
+            // embeds note stubs WITH their attachments. Merge them in by note id.
+            if (ticket.EmbeddedNotes != null)
+            {
+                var embedded = new Dictionary<int, List<TicketAttachment>>();
+                foreach (var e in ticket.EmbeddedNotes)
+                    if (e.Attachments is { Count: > 0 })
+                        embedded[e.Id] = e.Attachments;
+                foreach (var n in notes)
+                    if (n.Attachments is not { Count: > 0 } && embedded.TryGetValue(n.Id, out var att))
+                        n.Attachments = att;
+            }
             Notes.Clear();
             foreach (var n in notes.OrderByDescending(n => n.EffectiveDate))
                 Notes.Add(n);
@@ -432,25 +444,12 @@ public partial class TicketTabViewModel : TabViewModelBase
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     }
 
+    /// <summary>Opens the attachment's download URL in the default browser.</summary>
     [RelayCommand]
-    private async Task DownloadAttachmentAsync(TicketAttachment? attachment)
+    private void OpenAttachment(TicketAttachment? attachment)
     {
         if (attachment == null) return;
-        try
-        {
-            var (bytes, fileName) = await _session.Api.GetAttachmentAsync(attachment.Id);
-            var name = fileName ?? attachment.DisplayName;
-            var dlg = new SaveFileDialog { FileName = name };
-            if (dlg.ShowDialog() == true)
-            {
-                await File.WriteAllBytesAsync(dlg.FileName, bytes);
-                InfoMessage = $"Saved {name}.";
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = $"Download failed: {ex.Message}";
-        }
+        Process.Start(new ProcessStartInfo(_session.Api.GetAttachmentUrl(attachment.Id)) { UseShellExecute = true });
     }
 
     [RelayCommand]

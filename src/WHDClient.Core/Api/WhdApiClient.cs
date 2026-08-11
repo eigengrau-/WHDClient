@@ -150,15 +150,8 @@ public class WhdApiClient : IDisposable
         await EnsureSuccess(resp).ConfigureAwait(false);
     }
 
-    /// <summary>Downloads an attachment; returns bytes and filename (from content-disposition).</summary>
-    public async Task<(byte[] Bytes, string? FileName)> GetAttachmentAsync(int attachmentId, CancellationToken ct = default)
-    {
-        using var resp = await _http.GetAsync(BuildUrl($"/TicketAttachments/{attachmentId}", null), ct).ConfigureAwait(false);
-        await EnsureSuccess(resp).ConfigureAwait(false);
-        var bytes = await resp.Content.ReadAsByteArrayAsync(ct).ConfigureAwait(false);
-        var fileName = resp.Content.Headers.ContentDisposition?.FileName?.Trim('"');
-        return (bytes, fileName);
-    }
+    /// <summary>Browser-openable download URL for an attachment (apiKey-authenticated, inline disposition).</summary>
+    public string GetAttachmentUrl(int attachmentId) => BuildUrl($"/TicketAttachments/{attachmentId}", null);
 
     // ---------- sessions (needed for attachment upload) ----------
 

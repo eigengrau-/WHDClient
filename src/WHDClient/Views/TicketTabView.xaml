@@ -187,7 +187,7 @@
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
                                                     <TextBlock>
-                                                        <Hyperlink Command="{Binding DataContext.DownloadAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}"
+                                                        <Hyperlink Command="{Binding DataContext.OpenAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}"
                                                                    CommandParameter="{Binding}">
                                                             <Run Text="📎 "/><Run Text="{Binding DisplayName, Mode=OneWay}"/>
                                                         </Hyperlink>
@@ -202,22 +202,27 @@
                     </ItemsControl>
                 </ScrollViewer>
 
-                <!-- Ticket-level attachments -->
-                <Border Grid.Row="1" Background="{DynamicResource Panel2Brush}" CornerRadius="4" Padding="10" Margin="0,4,10,0">
+                <!-- Ticket-level attachments: capped with its own scroll so long lists
+                     (e.g. inline images from email-generated tickets) don't bury the notes -->
+                <Border Grid.Row="1" Background="{DynamicResource Panel2Brush}" CornerRadius="4" Padding="10" Margin="0,4,10,0"
+                        Visibility="{Binding Ticket.Attachments.Count, Converter={StaticResource PositiveIntToVisConverter}}">
                     <StackPanel>
                         <TextBlock Text="Ticket attachments" Style="{DynamicResource SubHeaderText}" FontSize="{DynamicResource FontSize12}"/>
-                        <ItemsControl ItemsSource="{Binding Ticket.Attachments}" Margin="0,6,0,0">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Margin="0,1">
-                                        <Hyperlink Command="{Binding DataContext.DownloadAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                   CommandParameter="{Binding}">
-                                            <Run Text="📎 "/><Run Text="{Binding DisplayName, Mode=OneWay}"/>
-                                        </Hyperlink>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <ScrollViewer MaxHeight="110" VerticalScrollBarVisibility="Auto"
+                                      beh:ScrollWheelSpeed.PixelsPerNotch="24">
+                            <ItemsControl ItemsSource="{Binding Ticket.Attachments}" Margin="0,6,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0,1">
+                                            <Hyperlink Command="{Binding DataContext.OpenAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                       CommandParameter="{Binding}">
+                                                <Run Text="📎 "/><Run Text="{Binding DisplayName, Mode=OneWay}"/>
+                                            </Hyperlink>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
                     </StackPanel>
                 </Border>
             </Grid>

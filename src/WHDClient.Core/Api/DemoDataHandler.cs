@@ -40,7 +40,7 @@ public class DemoDataHandler : HttpMessageHandler
             ("GET", "/TicketNotes") => DemoData.NotesFor(Int(q, "jobTicketId")),
             ("GET", "/Tickets/mine") => DemoData.Page(DemoData.Mine, q),
             ("GET", "/Tickets/group" or "/Tickets/flagged" or "/Tickets/recent") => DemoData.Page(DemoData.All, q),
-            ("GET", var p) when Regex.IsMatch(p, @"^/Tickets/\d+$") => DemoData.TicketById(IdOf(p)),
+            ("GET", var p) when Regex.IsMatch(p, @"^/Tickets/\d+$") => DemoData.WithEmbeddedNotes(DemoData.TicketById(IdOf(p))),
             ("GET", "/Tickets") => DemoData.Page(DemoData.Search(q.GetValueOrDefault("qualifier")), q),
             ("POST", "/Tickets") => DemoData.TicketById(1001),
             ("PUT", var p) when Regex.IsMatch(p, @"^/Tickets/\d+$") => DemoData.ApplyTicketUpdate(IdOf(p), ReadBody(req)),
@@ -272,6 +272,19 @@ internal static class DemoData
                 new() { Id = 801, Type = "TicketAttachment", FileName = "cart4-inventory.xlsx", UploadDate = reported.AddHours(1), Size = 18432 },
             };
         }
+        if (s.Id == 1003)
+        {
+            // Mimics an email-generated ticket with many inline images — exercises
+            // the capped, scrollable ticket-attachments section.
+            ticket.Attachments = Enumerable.Range(1, 12)
+                .Select(i => new TicketAttachment
+                {
+                    Id = 820 + i, Type = "TicketAttachment",
+                    FileName = $"site-survey-{i:00}.png",
+                    UploadDate = reported.AddHours(1), Size = 37_000 * i,
+                })
+                .ToList();
+        }
         return ticket;
     }
 
@@ -355,6 +368,13 @@ internal static class DemoData
                 DateUtc = Now.AddHours(-30), Client = client,
             },
         };
+    }
+
+    /// <summary>Mirrors the real server's style=details ticket response: note stubs with attachments embedded.</summary>
+    public static Ticket WithEmbeddedNotes(Ticket ticket)
+    {
+        ticket.EmbeddedNotes = NotesFor(ticket.Id);
+        return ticket;
     }
 
     public static Tech TechById(int id) => Techs.FirstOrDefault(t => t.Id == id) ?? Techs[0];
