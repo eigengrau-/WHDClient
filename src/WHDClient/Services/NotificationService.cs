@@ -136,9 +136,11 @@ public partial class NotificationService : ObservableObject
         }
     }
 
-    public void MarkAllRead()
+    /// <summary>Dismisses a single notification (clicked = handled); the rest of the feed is untouched.</summary>
+    public void Dismiss(AppNotification notification)
     {
-        UnreadCount = 0;
+        if (Notifications.Remove(notification) && UnreadCount > 0)
+            UnreadCount--;
     }
 
     public void RequestOpenTicket(int ticketId)

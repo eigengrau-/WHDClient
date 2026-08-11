@@ -54,8 +54,8 @@ public partial class MainWindow : Window
     {
         if (sender is FrameworkElement el && el.Tag is AppNotification notification && DataContext is MainViewModel vm)
         {
-            vm.Notifications.MarkAllRead();
-            NotifyToggle.IsChecked = false;
+            // Only the clicked notification is dismissed; the rest of the feed stays.
+            vm.Notifications.Dismiss(notification);
             if (notification.Url != null)
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(notification.Url) { UseShellExecute = true });
             else if (notification.TicketId is int ticketId)
