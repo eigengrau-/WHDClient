@@ -83,7 +83,7 @@
                         Visibility="{Binding HasDistinctDetail, Converter={StaticResource BoolToVisConverter}}">
                     <ScrollViewer MaxHeight="130" VerticalScrollBarVisibility="Auto"
                                   beh:ScrollWheelSpeed.PixelsPerNotch="24">
-                        <RichTextBox beh:BbCode.Text="{Binding Ticket.DisplayDetail, Mode=OneWay}"
+                        <RichTextBox beh:BbCode.Text="{Binding Ticket.RenderableDetail, Mode=OneWay}"
                                      Style="{DynamicResource SelectableRichText}"
                                      FontSize="{DynamicResource AppFontSize}"/>
                     </ScrollViewer>

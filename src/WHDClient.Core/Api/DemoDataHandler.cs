@@ -244,7 +244,9 @@ internal static class DemoData
             Type = "Ticket",
             Subject = s.Subject,
             ShortSubject = s.Subject,
-            Detail = s.Id == 1001 ? FeaturedDetail : $"Reported issue: {s.Subject}.",
+            Detail = s.Id == 1001 ? FeaturedDetail
+                : s.Id == 1003 ? HtmlDetail
+                : $"Reported issue: {s.Subject}.",
             ShortDetail = s.Subject,
             DisplayClient = client.DisplayName,
             ReportDateUtc = reported,
@@ -284,6 +286,19 @@ internal static class DemoData
         "The cart lives in the library workroom. Asset tags are in the attached inventory sheet.\n" +
         "[code]CB-1184, CB-1191, CB-1203[/code]\n" +
         "See the cart layout: [url=https://example.com/maps/maplewood]Maplewood floor plan[/url]";
+
+    // Request details come back from WHD as HTML (unlike BBCode notes) — this seed
+    // exercises the HTML rendering path in demo mode.
+    private const string HtmlDetail =
+        "Direct download: https://example.com/firmware/switches-9.3.2.iso<br />" +
+        "Vendor notes: &lt;https://example.com/docs/switch-firmware&gt;<br />" +
+        "The lab switches are due for firmware updates before the next maintenance window.<br />" +
+        "Planned order of work:<br />" +
+        "<ol><li>Back up current configs to the share<br /></li>" +
+        "<li>Stage the new firmware on switch <b>A2</b> first<br /></li>" +
+        "<li>Verify VLAN tables &amp; uplinks after reboot<br /></li>" +
+        "<li>Roll out to the remaining switches</li></ol>" +
+        "Exact versions are in the <a href=\"https://example.com/firmware/switches\">firmware matrix</a>.";
 
     public static List<TicketNote> NotesFor(int ticketId)
     {

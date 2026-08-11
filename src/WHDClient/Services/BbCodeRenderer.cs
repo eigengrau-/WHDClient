@@ -1,15 +1,17 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WHDClient.Core.BbCode;
+using WHDClient.Core.RichText;
 
 namespace WHDClient.Services;
 
-/// <summary>Renders parsed BBCode (see <see cref="BbCodeParser"/>) into a WPF FlowDocument.</summary>
-public static class BbCodeRenderer
+/// <summary>Renders parsed BBCode or HTML (auto-detected, see <see cref="RichTextParser"/>) into a WPF FlowDocument.</summary>
+public static partial class BbCodeRenderer
 {
     public static FlowDocument Render(string? bbText)
     {
@@ -19,7 +21,7 @@ public static class BbCodeRenderer
             TextAlignment = TextAlignment.Left
         };
 
-        foreach (var block in BbCodeParser.Parse(bbText))
+        foreach (var block in RichTextParser.Parse(bbText))
         {
             switch (block)
             {
@@ -108,9 +110,26 @@ public static class BbCodeRenderer
         for (var i = 0; i < lines.Length; i++)
         {
             if (i > 0) para.Inlines.Add(new LineBreak());
-            if (lines[i].Length > 0)
-                para.Inlines.Add(ApplyFormat(new Run(lines[i]), t));
+            AddRunsAutolinked(para, lines[i], t);
         }
+    }
+
+    /// <summary>Adds text as runs, turning bare http(s) URLs into clickable hyperlinks.</summary>
+    private static void AddRunsAutolinked(Paragraph para, string text, BbText format)
+    {
+        var pos = 0;
+        foreach (Match m in BareUrlRegex().Matches(text))
+        {
+            // Trim punctuation that typically follows a URL in prose (e.g. "<https://x>").
+            var url = m.Value.TrimEnd('.', ',', ';', ':', '!', '?', ')', ']', '>', '"', '\'');
+            if (url.Length == 0) continue;
+            if (m.Index > pos)
+                para.Inlines.Add(ApplyFormat(new Run(text[pos..m.Index]), format));
+            para.Inlines.Add(ApplyFormat(MakeLink(url, url), format));
+            pos = m.Index + url.Length; // trailing punctuation stays as plain text
+        }
+        if (pos < text.Length)
+            para.Inlines.Add(ApplyFormat(new Run(text[pos..]), format));
     }
 
     private static Inline ApplyFormat(Inline inline, BbNode node)
@@ -168,6 +187,9 @@ public static class BbCodeRenderer
             return null;
         }
     }
+
+    [GeneratedRegex(@"https?://[^\s<>""']+", RegexOptions.IgnoreCase)]
+    private static partial Regex BareUrlRegex();
 
     private static T Resource<T>(string key) =>
         Application.Current?.TryFindResource(key) is T v

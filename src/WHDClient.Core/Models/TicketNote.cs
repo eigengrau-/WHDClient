@@ -30,9 +30,12 @@ public class TicketNote
     public bool IsTechNote => string.Equals(Type, "TechNote", StringComparison.OrdinalIgnoreCase)
                               || string.Equals(Type, "MobileTechNote", StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>Best display text: plain noteText if present, otherwise the HTML mobile variant stripped.</summary>
+    /// <summary>
+    /// Text for rich display: the BBCode noteText when present, otherwise the raw HTML
+    /// mobile variant. The renderer auto-detects the dialect, so no stripping happens here.
+    /// </summary>
     [JsonIgnore]
-    public string DisplayText => !string.IsNullOrWhiteSpace(NoteText) ? NoteText : StripHtml(MobileNoteText);
+    public string? DisplayText => !string.IsNullOrWhiteSpace(NoteText) ? NoteText : MobileNoteText;
 
     [JsonIgnore]
     public string AuthorDisplay =>
@@ -49,14 +52,6 @@ public class TicketNote
         var end = pretty.IndexOf("</strong>", StringComparison.OrdinalIgnoreCase);
         if (start < 0 || end <= start) return null;
         return pretty[(start + 8)..end].Trim();
-    }
-
-    private static string? StripHtml(string? html)
-    {
-        if (string.IsNullOrEmpty(html)) return null;
-        var s = System.Text.RegularExpressions.Regex.Replace(html, "<br\\s*/?>", "\n", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        s = System.Text.RegularExpressions.Regex.Replace(s, "<[^>]+>", "");
-        return System.Net.WebUtility.HtmlDecode(s).Trim();
     }
 
     [JsonIgnore]

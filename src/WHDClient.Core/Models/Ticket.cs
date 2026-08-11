@@ -70,6 +70,13 @@ public class Ticket
     internal static string OneLine(string s) =>
         System.Text.RegularExpressions.Regex.Replace(s, @"\s+", " ").Trim();
 
+    /// <summary>
+    /// Raw detail for rich rendering. WHD stores request details as HTML while notes
+    /// are BBCode; the renderer auto-detects the dialect, so no stripping happens here.
+    /// </summary>
+    [JsonIgnore]
+    public string RenderableDetail => Detail ?? ShortDetail ?? "";
+
     /// <summary>Detail with HTML markup stripped for plain-text display.</summary>
     [JsonIgnore]
     public string DisplayDetail
