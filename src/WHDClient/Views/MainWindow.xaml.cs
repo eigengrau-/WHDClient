@@ -28,6 +28,14 @@ public partial class MainWindow : Window
         SidebarToggleGlyph.Text = "❯";
         SidebarToggle.ToolTip = "Expand sidebar";
         AutomationProperties.SetName(SidebarToggle, "Expand sidebar");
+        // Notifications move into the collapsed bell; close any open popup anchored at the
+        // now-hidden expanded toggle.
+        CollapsedBell.Visibility = Visibility.Visible;
+        if (Popup.IsOpen)
+        {
+            Popup.IsOpen = false;
+            NotifyToggle.IsChecked = false;
+        }
     }
 
     private void SidebarToggle_Unchecked(object sender, RoutedEventArgs e)
@@ -39,6 +47,9 @@ public partial class MainWindow : Window
         SidebarToggleGlyph.Text = "❮";
         SidebarToggle.ToolTip = "Collapse sidebar";
         AutomationProperties.SetName(SidebarToggle, "Collapse sidebar");
+        CollapsedBell.Visibility = Visibility.Collapsed;
+        Popup.PlacementTarget = NotifyToggle;
+        Popup.HorizontalOffset = 0;
     }
 
     private void TicketNumberBox_KeyDown(object sender, KeyEventArgs e)
@@ -65,6 +76,24 @@ public partial class MainWindow : Window
             settings.Save();
         }
         base.OnClosing(e);
+    }
+
+    /// <summary>Opens the notification popup anchored at the expanded toggle.</summary>
+    private void NotifyToggle_Checked(object sender, RoutedEventArgs e)
+    {
+        if (SidebarColumn.Width.Value > SidebarCollapsedWidth)
+        {
+            Popup.PlacementTarget = NotifyToggle;
+            Popup.HorizontalOffset = 0;
+        }
+    }
+
+    /// <summary>Expands the sidebar and opens the notification feed the normal way — the bell is
+    /// just an indicator that unseen notifications exist while the sidebar is collapsed.</summary>
+    private void CollapsedBell_Click(object sender, RoutedEventArgs e)
+    {
+        SidebarToggle.IsChecked = false; // expand; SidebarToggle_Unchecked restores the toggle and popup anchor
+        NotifyToggle.IsChecked = true;   // open the notifications popup
     }
 
     private void Notification_Click(object sender, MouseButtonEventArgs e)
