@@ -49,7 +49,12 @@ public class PositiveIntToVisConverter : IValueConverter
 public class StringToVisConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        => string.IsNullOrWhiteSpace(value as string) ? Visibility.Collapsed : Visibility.Visible;
+    {
+        var vis = string.IsNullOrWhiteSpace(value as string) ? Visibility.Collapsed : Visibility.Visible;
+        if (parameter is string s && s.Equals("invert", StringComparison.OrdinalIgnoreCase))
+            vis = vis == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        return vis;
+    }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotSupportedException();

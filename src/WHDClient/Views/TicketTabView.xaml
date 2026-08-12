@@ -257,6 +257,7 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
@@ -265,11 +266,50 @@
                         <views:BbCodeToolbar Target="{Binding ElementName=ReplyBox}" DockPanel.Dock="Right"
                                              HorizontalAlignment="Right"/>
                     </DockPanel>
+                    <!-- Reply templates: save the current reply under a name, load one back via the dropdown.
+                         Inline under the BBCode buttons, above the reply box. The name box and Save button
+                         only appear once there is reply text to save; the dropdown always shows. -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,2,0,0">
+                        <Grid Width="150" Visibility="{Binding ReplyText, Converter={StaticResource StringToVisConverter}}">
+                            <TextBox x:Name="TemplateNameBox" Text="{Binding NewTemplateName, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Template name" VerticalContentAlignment="Center"
+                                     AutomationProperties.Name="Template name"/>
+                            <TextBlock Text="Name..." FontStyle="Italic" Foreground="{DynamicResource TextDimBrush}"
+                                       IsHitTestVisible="False" VerticalAlignment="Center" Margin="6,0,0,0"
+                                       Visibility="{Binding Text, ElementName=TemplateNameBox, Converter={StaticResource StringToVisConverter}, ConverterParameter=invert}"/>
+                        </Grid>
+                        <Button Content="Save Template" Command="{Binding SaveTemplateCommand}"
+                                AutomationProperties.Name="Save Template" Margin="6,0,0,0" Padding="8,2"
+                                Visibility="{Binding ReplyText, Converter={StaticResource StringToVisConverter}}"/>
+                        <Grid Margin="12,0,0,0">
+                            <ComboBox x:Name="TemplateCombo" Width="180" VerticalAlignment="Center"
+                                      ItemsSource="{Binding ReplyTemplates}" SelectedItem="{Binding SelectedReplyTemplate}"
+                                      ToolTip="Select a saved template to load it into the reply box"
+                                      AutomationProperties.Name="Template list" MaxDropDownHeight="240">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel>
+                                            <Button DockPanel.Dock="Right" Content="✕" Padding="5,0" FontSize="{DynamicResource FontSize10}"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    Command="{Binding DataContext.DeleteTemplateCommand, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                    CommandParameter="{Binding}"
+                                                    PreviewMouseLeftButtonDown="TemplateDelete_PreviewMouseLeftButtonDown"
+                                                    AutomationProperties.Name="Delete template"/>
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBlock Text="Load a template..." FontStyle="Italic" Foreground="{DynamicResource TextDimBrush}"
+                                       IsHitTestVisible="False" VerticalAlignment="Center" Margin="8,0,0,0"
+                                       Visibility="{Binding SelectedItem, ElementName=TemplateCombo, Converter={StaticResource NullToVisConverter}, ConverterParameter=invert}"/>
+                        </Grid>
+                    </StackPanel>
                     <!-- Reply box fills all the vertical space the controls below don't use -->
-                    <TextBox x:Name="ReplyBox" Grid.Row="1" Text="{Binding ReplyText, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox x:Name="ReplyBox" Grid.Row="2" Text="{Binding ReplyText, UpdateSourceTrigger=PropertyChanged}"
                              AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
                              VerticalContentAlignment="Top" Margin="0,8" MinHeight="60"/>
-                    <StackPanel Grid.Row="2" VerticalAlignment="Top">
+                    <StackPanel Grid.Row="3" VerticalAlignment="Top">
                         <WrapPanel>
                             <CheckBox Content="Email client" IsChecked="{Binding ReplyEmailClient}" Margin="0,0,10,2"/>
                             <CheckBox Content="Email tech" IsChecked="{Binding ReplyEmailTech}" Margin="0,0,10,2"/>

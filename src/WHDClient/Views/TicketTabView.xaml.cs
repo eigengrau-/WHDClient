@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using WHDClient.Services;
 using WHDClient.ViewModels;
 
 namespace WHDClient.Views;
@@ -38,5 +39,14 @@ public partial class TicketTabView : UserControl
         if (ReferenceEquals(e.NewFocus, FindCcButton) || ReferenceEquals(e.NewFocus, CcCombo)) return;
         if (e.NewFocus is DependencyObject d && CcCombo.IsAncestorOf(d)) return;
         vm.CcSearchText = "";
+    }
+
+    /// <summary>Deletes a template from the dropdown. Handled on mouse-down so the ✕ click
+    /// does not also select the item (which would load the template into the reply box).</summary>
+    private void TemplateDelete_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        if (sender is FrameworkElement { DataContext: ReplyTemplate template } && DataContext is TicketTabViewModel vm)
+            vm.DeleteTemplateCommand.Execute(template);
     }
 }

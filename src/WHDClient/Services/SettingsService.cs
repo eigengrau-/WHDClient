@@ -23,6 +23,13 @@ public class GridColumnState
     public string? Width { get; set; }
 }
 
+/// <summary>A saved reply template: a name and the BBCode text it expands to.</summary>
+public class ReplyTemplate
+{
+    public string Name { get; set; } = "";
+    public string Text { get; set; } = "";
+}
+
 public class AppSettings
 {
     public const string DefaultServerUrl = "";
@@ -52,6 +59,8 @@ public class AppSettings
     public List<string> OpenTabs { get; set; } = new();
     /// <summary>The tab selected when the app was closed (same key format as OpenTabs).</summary>
     public string? SelectedTab { get; set; }
+    /// <summary>Saved reply templates (name + BBCode text).</summary>
+    public List<ReplyTemplate> ReplyTemplates { get; set; } = new();
 }
 
 /// <summary>Loads/saves settings JSON in %APPDATA%\WHDClient; API key is DPAPI-protected.</summary>

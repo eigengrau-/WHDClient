@@ -98,6 +98,67 @@ partial void OnCcSearchTextChanged(string value) => OnPropertyChanged(nameof(IsC
     /// <summary>Files staged in the reply panel; uploaded onto the note when it is posted.</summary>
     public ObservableCollection<string> PendingReplyAttachments { get; } = new();
 
+    /// <summary>Saved reply templates; selecting one loads its text into the reply box.</summary>
+    public ObservableCollection<ReplyTemplate> ReplyTemplates { get; } = new();
+
+    [ObservableProperty] private string _newTemplateName = "";
+    [ObservableProperty] private ReplyTemplate? _selectedReplyTemplate;
+
+    partial void OnSelectedReplyTemplateChanged(ReplyTemplate? value)
+    {
+        if (value == null) return;
+        ReplyText = value.Text;
+        // Reset the selection so the dropdown returns to its placeholder. Clearing
+        // SelectedItem synchronously inside the ComboBox's own selection event leaves
+        // the template name displayed, so the reset is deferred through the dispatcher.
+        void Reset() => SelectedReplyTemplate = null;
+        if (System.Windows.Application.Current?.Dispatcher is { } d) d.BeginInvoke(Reset);
+        else Reset();
+    }
+
+    [RelayCommand]
+    private void SaveTemplate()
+    {
+        var name = NewTemplateName.Trim();
+        if (name.Length == 0)
+        {
+            ErrorMessage = "Enter a template name.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(ReplyText))
+        {
+            ErrorMessage = "Write the template text in the reply box first.";
+            return;
+        }
+        var existing = _settings.Settings.ReplyTemplates.FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (existing != null) existing.Text = ReplyText;
+        else _settings.Settings.ReplyTemplates.Add(new ReplyTemplate { Name = name, Text = ReplyText });
+        _settings.Save();
+        RefreshReplyTemplates();
+        NewTemplateName = "";
+        ErrorMessage = null;
+        InfoMessage = $"Template '{name}' saved.";
+    }
+
+    private void RefreshReplyTemplates()
+    {
+        ReplyTemplates.Clear();
+        foreach (var t in _settings.Settings.ReplyTemplates)
+            ReplyTemplates.Add(t);
+    }
+
+    [RelayCommand]
+    private void DeleteTemplate(ReplyTemplate? template)
+    {
+        if (template == null) return;
+        _settings.Settings.ReplyTemplates.Remove(template);
+        _settings.Save();
+        RefreshReplyTemplates();
+        if (ReferenceEquals(SelectedReplyTemplate, template)) SelectedReplyTemplate = null;
+        ErrorMessage = null;
+        InfoMessage = $"Template '{template.Name}' deleted.";
+    }
+
     public TicketTabViewModel(WhdSessionContext session, SettingsService settings, NotificationService notifications,
         int ticketId, Action? bookmarkChanged = null)
     {
@@ -108,6 +169,7 @@ partial void OnCcSearchTextChanged(string value) => OnPropertyChanged(nameof(IsC
         TicketId = ticketId;
         Header = $"#{ticketId}";
         IsBookmarked = settings.Settings.BookmarkedTicketIds.Contains(ticketId);
+        RefreshReplyTemplates();
         _ = RefreshCoreAsync();
     }
 
