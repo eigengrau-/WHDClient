@@ -126,7 +126,8 @@
                 <StackPanel x:Name="SidebarBottom" Grid.Row="2" Margin="10,10">
                     <!-- Notifications -->
                     <ToggleButton x:Name="NotifyToggle" Padding="8,6" HorizontalContentAlignment="Left"
-                                  Checked="NotifyToggle_Checked">
+                                  Click="NotifyToggle_Click"
+                                  PreviewMouseLeftButtonDown="NotifyToggle_PreviewMouseLeftButtonDown">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🔔 "/>
                             <TextBlock Text="Notifications"/>
@@ -137,8 +138,7 @@
                         </StackPanel>
                     </ToggleButton>
                     <Popup x:Name="Popup" Placement="Top" PlacementTarget="{Binding ElementName=NotifyToggle}"
-                           IsOpen="{Binding IsChecked, ElementName=NotifyToggle, Mode=TwoWay}"
-                           StaysOpen="False" Width="380" MaxHeight="420">
+                           IsOpen="False" StaysOpen="False" Width="380" MaxHeight="420">
                         <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource HeaderBrush}"
                                 BorderThickness="1" CornerRadius="4" Padding="10">
                             <Grid>
@@ -148,6 +148,9 @@
                                 </Grid.RowDefinitions>
                                 <DockPanel>
                                     <TextBlock Text="Notifications" Style="{DynamicResource SubHeaderText}" DockPanel.Dock="Left"/>
+                                    <Button DockPanel.Dock="Right" Content="Clear all" Click="ClearAll_Click"
+                                            AutomationProperties.Name="Clear all" Padding="8,2"
+                                            FontSize="{DynamicResource FontSize11}" HorizontalAlignment="Right"/>
                                 </DockPanel>
                                 <ScrollViewer Grid.Row="1" MaxHeight="360" VerticalScrollBarVisibility="Auto"
                                               beh:ScrollWheelSpeed.PixelsPerNotch="24">

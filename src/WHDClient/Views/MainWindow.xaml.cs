@@ -17,6 +17,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DarkTitleBar.Apply(this);
+        // Keep the toggle's visual state in sync when the popup closes on its own (outside click).
+        Popup.Closed += (_, _) => NotifyToggle.IsChecked = false;
     }
 
     private void SidebarToggle_Checked(object sender, RoutedEventArgs e)
@@ -78,13 +80,29 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 
-    /// <summary>Opens the notification popup anchored at the expanded toggle.</summary>
-    private void NotifyToggle_Checked(object sender, RoutedEventArgs e)
+    // Set before the popup's StaysOpen close-on-outside-click runs, so a click on the
+    // open toggle is treated as "close it" rather than "reopen it".
+    private bool _notifyPopupWasOpen;
+
+    private void NotifyToggle_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (SidebarColumn.Width.Value > SidebarCollapsedWidth)
+        _notifyPopupWasOpen = Popup.IsOpen;
+    }
+
+    /// <summary>Opens/closes the notification popup anchored at the expanded toggle.</summary>
+    private void NotifyToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (_notifyPopupWasOpen)
+        {
+            // The StaysOpen popup already closed on mouse-down; don't let the toggle reopen it.
+            Popup.IsOpen = false;
+            NotifyToggle.IsChecked = false;
+        }
+        else
         {
             Popup.PlacementTarget = NotifyToggle;
             Popup.HorizontalOffset = 0;
+            Popup.IsOpen = true;
         }
     }
 
@@ -93,7 +111,16 @@ public partial class MainWindow : Window
     private void CollapsedBell_Click(object sender, RoutedEventArgs e)
     {
         SidebarToggle.IsChecked = false; // expand; SidebarToggle_Unchecked restores the toggle and popup anchor
-        NotifyToggle.IsChecked = true;   // open the notifications popup
+        Popup.PlacementTarget = NotifyToggle;
+        Popup.HorizontalOffset = 0;
+        Popup.IsOpen = true;
+        NotifyToggle.IsChecked = true;
+    }
+
+    /// <summary>Removes every notification from the feed.</summary>
+    private void ClearAll_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel vm) vm.Notifications.ClearAll();
     }
 
     private void Notification_Click(object sender, MouseButtonEventArgs e)

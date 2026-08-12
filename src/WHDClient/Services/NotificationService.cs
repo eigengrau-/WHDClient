@@ -143,6 +143,13 @@ public partial class NotificationService : ObservableObject
             UnreadCount--;
     }
 
+    /// <summary>Removes every notification from the feed.</summary>
+    public void ClearAll()
+    {
+        Notifications.Clear();
+        UnreadCount = 0;
+    }
+
     public void RequestOpenTicket(int ticketId)
     {
         OpenTicketRequested?.Invoke(this, ticketId);
