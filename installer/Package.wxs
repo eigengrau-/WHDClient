@@ -7,7 +7,7 @@
   -->
   <Package Name="WHD Client"
            Language="1033"
-           Version="1.8.1"
+           Version="1.8.2"
            Manufacturer="WHD Client"
            UpgradeCode="3ecb923e-8430-4cb4-83e3-0d3c7087ac3f"
            Scope="perMachine">
