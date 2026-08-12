@@ -17,8 +17,17 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DarkTitleBar.Apply(this);
-        // Keep the toggle's visual state in sync when the popup closes on its own (outside click).
+        // Keep the toggle's visual state in sync whenever the popup closes.
         Popup.Closed += (_, _) => NotifyToggle.IsChecked = false;
+        // With StaysOpen=True the popup only closes explicitly: a click anywhere in the
+        // window outside the toggle (or the toggle itself) closes it.
+        PreviewMouseLeftButtonDown += (_, e) =>
+        {
+            if (!Popup.IsOpen) return;
+            if (e.OriginalSource is DependencyObject d && NotifyToggle.IsAncestorOf(d)) return;
+            Popup.IsOpen = false;
+            NotifyToggle.IsChecked = false;
+        };
     }
 
     private void SidebarToggle_Checked(object sender, RoutedEventArgs e)
@@ -80,29 +89,18 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 
-    // Set before the popup's StaysOpen close-on-outside-click runs, so a click on the
-    // open toggle is treated as "close it" rather than "reopen it".
-    private bool _notifyPopupWasOpen;
-
-    private void NotifyToggle_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        _notifyPopupWasOpen = Popup.IsOpen;
-    }
-
     /// <summary>Opens/closes the notification popup anchored at the expanded toggle.</summary>
     private void NotifyToggle_Click(object sender, RoutedEventArgs e)
     {
-        if (_notifyPopupWasOpen)
-        {
-            // The StaysOpen popup already closed on mouse-down; don't let the toggle reopen it.
-            Popup.IsOpen = false;
-            NotifyToggle.IsChecked = false;
-        }
-        else
+        if (NotifyToggle.IsChecked == true)
         {
             Popup.PlacementTarget = NotifyToggle;
             Popup.HorizontalOffset = 0;
             Popup.IsOpen = true;
+        }
+        else
+        {
+            Popup.IsOpen = false;
         }
     }
 
