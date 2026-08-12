@@ -6,8 +6,9 @@
     <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
@@ -77,20 +78,41 @@
                     </WrapPanel>
                 </Border>
 
-                <!-- Request detail: hidden when it just repeats the subject -->
-                <Border BorderBrush="{DynamicResource HeaderBrush}" BorderThickness="3,0,0,0"
-                        Background="{DynamicResource Panel2Brush}" Padding="10,5" Margin="0,6,0,0"
-                        Visibility="{Binding HasDistinctDetail, Converter={StaticResource BoolToVisConverter}}">
-                    <ScrollViewer MaxHeight="130" VerticalScrollBarVisibility="Auto"
-                                  beh:ScrollWheelSpeed.PixelsPerNotch="24">
-                        <RichTextBox beh:BbCode.Text="{Binding Ticket.RenderableDetail, Mode=OneWay}"
-                                     Style="{DynamicResource SelectableRichText}"
-                                     FontSize="{DynamicResource AppFontSize}"/>
-                    </ScrollViewer>
-                </Border>
+            </StackPanel>
+        </Border>
 
-                <!-- Editable fields -->
-                <Grid Margin="0,8,0,0">
+        <!-- Ticket details textbox: half the vertical space; resize with the splitter below -->
+        <Border Grid.Row="1" BorderBrush="{DynamicResource HeaderBrush}" BorderThickness="3,0,0,0"
+                Background="{DynamicResource Panel2Brush}" Padding="10,5" Margin="0,0,0,6"
+                Visibility="{Binding HasDistinctDetail, Converter={StaticResource BoolToVisConverter}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          beh:ScrollWheelSpeed.PixelsPerNotch="24">
+                <RichTextBox beh:BbCode.Text="{Binding Ticket.RenderableDetail, Mode=OneWay}"
+                             Style="{DynamicResource SelectableRichText}"
+                             FontSize="{DynamicResource AppFontSize}"/>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Horizontal splitter: resize the ticket details textbox against the fields/notes below -->
+        <GridSplitter Grid.Row="2" Height="8" HorizontalAlignment="Stretch"
+                      VerticalAlignment="Center" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
+                      Background="{DynamicResource BorderBrushDim}" Cursor="SizeNS"/>
+
+        <!-- Bottom half: editable fields + notes/reply editor -->
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Busy indicator while refreshing / saving -->
+            <ProgressBar IsIndeterminate="True" Margin="0,0,0,6"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisConverter}}"/>
+
+            <!-- Editable fields -->
+            <StackPanel Grid.Row="1" Margin="0,0,0,8">
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -142,19 +164,14 @@
                 <TextBlock Text="{Binding ErrorMessage}" Foreground="#c0504d" Margin="0,4,0,0"
                            Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisConverter}}"/>
             </StackPanel>
-        </Border>
 
-        <!-- Busy indicator while refreshing / saving -->
-        <ProgressBar Grid.Row="1" IsIndeterminate="True" Margin="0,0,0,6"
-                     Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisConverter}}"/>
-
-        <!-- Body: notes + attachments | reply -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <!-- Body: notes + attachments | reply -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -240,28 +257,19 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
-                        <!-- Bottom controls (checkboxes/Cc/files/Add note) must never be clipped,
-                             even at Large font: the star share floors at their content height. -->
-                        <RowDefinition Height="*" MinHeight="175"/>
                     </Grid.RowDefinitions>
                     <DockPanel>
                         <TextBlock Text="Reply (tech note)" Style="{DynamicResource SubHeaderText}" DockPanel.Dock="Left"/>
                         <views:BbCodeToolbar Target="{Binding ElementName=ReplyBox}" DockPanel.Dock="Right"
                                              HorizontalAlignment="Right"/>
                     </DockPanel>
+                    <!-- Reply box fills all the vertical space the controls below don't use -->
                     <TextBox x:Name="ReplyBox" Grid.Row="1" Text="{Binding ReplyText, UpdateSourceTrigger=PropertyChanged}"
                              AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
                              VerticalContentAlignment="Top" Margin="0,8" MinHeight="60"/>
-                    <!-- Drag to resize the reply box vertically; both the editor row and the
-                         controls row below are star-sized so the splitter can grow OR shrink it. -->
-                    <GridSplitter Grid.Row="2" Height="8" HorizontalAlignment="Stretch" Margin="0,2"
-                                  ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
-                                  Background="{DynamicResource BorderBrushDim}" Cursor="SizeNS"
-                                  ToolTip="Drag to resize the reply box"
-                                  AutomationProperties.Name="Resize reply box"/>
-                    <StackPanel Grid.Row="3" VerticalAlignment="Top">
+                    <StackPanel Grid.Row="2" VerticalAlignment="Top">
                         <WrapPanel>
                             <CheckBox Content="Email client" IsChecked="{Binding ReplyEmailClient}" Margin="0,0,10,2"/>
                             <CheckBox Content="Email tech" IsChecked="{Binding ReplyEmailTech}" Margin="0,0,10,2"/>
@@ -280,18 +288,18 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Cc:" VerticalAlignment="Center"/>
                                 <TextBox Grid.Column="1" Text="{Binding CcSearchText, UpdateSourceTrigger=PropertyChanged}"
-                                         Margin="6,0,0,0">
+                                         LostKeyboardFocus="CcSearchBox_LostKeyboardFocus" Margin="6,0,0,0">
                                     <TextBox.InputBindings>
                                         <KeyBinding Key="Enter" Command="{Binding SearchCcCommand}"/>
                                     </TextBox.InputBindings>
                                 </TextBox>
-                                <Button Grid.Column="2" Content="Find" Command="{Binding SearchCcCommand}"
+                                <Button Grid.Column="2" x:Name="FindCcButton" Content="Find" Command="{Binding SearchCcCommand}"
                                         AutomationProperties.Name="Find Cc" Margin="6,0,0,0" Padding="10,3"/>
                             </Grid>
                             <ProgressBar IsIndeterminate="True" Height="3" Margin="24,2,0,0"
                                          Visibility="{Binding IsSearchingCc, Converter={StaticResource BoolToVisConverter}}"/>
                             <ComboBox x:Name="CcCombo" ItemsSource="{Binding CcResults}" SelectedItem="{Binding SelectedCcResult}"
-                                      DisplayMemberPath="Label" Margin="24,4,0,0" MaxDropDownHeight="240"
+                                      DisplayMemberPath="DropdownLabel" Margin="24,4,0,0" MaxDropDownHeight="240"
                                       Visibility="{Binding CcResults.Count, Converter={StaticResource PositiveIntToVisConverter}}"/>
                             <ItemsControl ItemsSource="{Binding CcRecipients}" Margin="24,4,0,0">
                                 <ItemsControl.ItemsPanel>
@@ -317,32 +325,34 @@
                         </StackPanel>
 
                         <!-- Note attachments: staged here, uploaded onto the note when it is posted -->
-                        <StackPanel Margin="0,4,0,0">
+                        <ItemsControl ItemsSource="{Binding PendingReplyAttachments}" Margin="0,4,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel Margin="0,1">
+                                        <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="{DynamicResource FontSize10}"
+                                                Background="Transparent" BorderThickness="0"
+                                                Command="{Binding DataContext.RemoveReplyAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <TextBlock Text="{Binding}" Style="{DynamicResource DimText}" FontSize="{DynamicResource FontSize12}"
+                                                   TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Add file and Add note on one line -->
+                        <DockPanel Margin="0,6,0,0">
+                            <Button Content="Add note" Style="{DynamicResource AccentButton}" DockPanel.Dock="Right"
+                                    Command="{Binding ReplyCommand}" Padding="12,5"
+                                    IsEnabled="{Binding IsCcTextEmpty}"
+                                    ToolTip="Unresolved text in the Cc box must be added or cleared before posting"/>
                             <Button Content="+ Add file" Command="{Binding AddReplyAttachmentsCommand}" AutomationProperties.Name="Add file"
                                     Padding="8,2" HorizontalAlignment="Left"/>
-                            <ItemsControl ItemsSource="{Binding PendingReplyAttachments}" Margin="0,4,0,0">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <DockPanel Margin="0,1">
-                                            <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="{DynamicResource FontSize10}"
-                                                    Background="Transparent" BorderThickness="0"
-                                                    Command="{Binding DataContext.RemoveReplyAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                    CommandParameter="{Binding}"/>
-                                            <TextBlock Text="{Binding}" Style="{DynamicResource DimText}" FontSize="{DynamicResource FontSize12}"
-                                                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                        </DockPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-
-                        <Grid Margin="0,6,0,0">
-                            <Button Content="Add note" Style="{DynamicResource AccentButton}"
-                                    Command="{Binding ReplyCommand}" Padding="12,5" HorizontalAlignment="Right"/>
-                        </Grid>
+                        </DockPanel>
                     </StackPanel>
                 </Grid>
             </Border>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

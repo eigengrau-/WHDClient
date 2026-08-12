@@ -69,12 +69,17 @@ public partial class TicketTabViewModel : TabViewModelBase
     [ObservableProperty] private bool _replyEmailTech;
     [ObservableProperty] private bool _replyAlsoSetStatus;
 
-    // Cc recipients on the reply (searched from techs + clients, sent as email addresses)
-    [ObservableProperty] private string _ccSearchText = "";
-    [ObservableProperty] private bool _isSearchingCc;
-    [ObservableProperty] private CcRecipient? _selectedCcResult;
-    public ObservableCollection<CcRecipient> CcResults { get; } = new();
-    public ObservableCollection<CcRecipient> CcRecipients { get; } = new();
+// Cc recipients on the reply (searched from techs + clients, sent as email addresses)
+[ObservableProperty] private string _ccSearchText = "";
+[ObservableProperty] private bool _isSearchingCc;
+[ObservableProperty] private CcRecipient? _selectedCcResult;
+public ObservableCollection<CcRecipient> CcResults { get; } = new();
+public ObservableCollection<CcRecipient> CcRecipients { get; } = new();
+
+/// <summary>True while no un-added text sits in the Cc box; the reply can be posted.</summary>
+public bool IsCcTextEmpty => string.IsNullOrEmpty(CcSearchText);
+
+partial void OnCcSearchTextChanged(string value) => OnPropertyChanged(nameof(IsCcTextEmpty));
 
     /// <summary>Raised (on the UI thread) after a Cc search completes; the view opens the results dropdown.</summary>
     public event Action? CcSearchCompleted;
@@ -391,10 +396,16 @@ public partial class TicketTabViewModel : TabViewModelBase
             var clients = await _session.Lookups.SearchClientsAsync(fragment);
             CcResults.Clear();
             foreach (var t in techs.Where(t => t.IsSelectable && !string.IsNullOrEmpty(t.Email) && MatchesFragment(t, fragment)))
-                CcResults.Add(new CcRecipient { Email = t.Email!, Name = t.DisplayName, Kind = "Tech" });
+                CcResults.Add(new CcRecipient(t.Email!, t.DisplayName, "Tech"));
             foreach (var c in clients.Where(c => !string.IsNullOrEmpty(c.Email)
                      && CcResults.All(r => !r.Email.Equals(c.Email, StringComparison.OrdinalIgnoreCase))))
-                CcResults.Add(new CcRecipient { Email = c.Email!, Name = c.DisplayName, Kind = "Client" });
+                CcResults.Add(new CcRecipient(c.Email!, c.DisplayName, "Client"));
+
+            // Nothing matched and the typed text looks like an email: offer to add it as an
+            // external recipient anyway (WHD mails arbitrary addresses in the Cc field).
+            if (CcResults.Count == 0 && IsEmailAddress(fragment))
+                CcResults.Add(new CcRecipient(fragment, fragment, "External",
+                    $"Add External Recipient: {fragment}", fragment));
         }
         catch (Exception ex)
         {
@@ -412,6 +423,11 @@ public partial class TicketTabViewModel : TabViewModelBase
         (t.LastName?.Contains(fragment, StringComparison.OrdinalIgnoreCase) ?? false) ||
         (t.ServerDisplayName?.Contains(fragment, StringComparison.OrdinalIgnoreCase) ?? false) ||
         (t.Email?.Contains(fragment, StringComparison.OrdinalIgnoreCase) ?? false);
+
+    private static readonly System.Text.RegularExpressions.Regex EmailRegex =
+        new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    private static bool IsEmailAddress(string s) => EmailRegex.IsMatch(s);
 
     [RelayCommand]
     private void RemoveCcRecipient(CcRecipient? recipient)
@@ -464,14 +480,26 @@ public partial class TicketTabViewModel : TabViewModelBase
     }
 }
 
-/// <summary>A Cc recipient picked from techs/clients; WHD wants the email address.</summary>
+/// <summary>A Cc recipient picked from techs/clients (or added manually as an external address); WHD wants the email.</summary>
 public class CcRecipient
 {
-    public required string Email { get; init; }
-    public required string Name { get; init; }
-    /// <summary>"Tech" or "Client".</summary>
-    public required string Kind { get; init; }
+    public CcRecipient(string email, string name, string kind, string? dropdownLabel = null, string? label = null)
+    {
+        Email = email;
+        Name = name;
+        Kind = kind;
+        DropdownLabel = dropdownLabel ?? $"{email} ({name})";
+        Label = label ?? $"{email} ({name})";
+    }
 
-    /// <summary>Matches the web UI's format: "email (Name)".</summary>
-    public string Label => $"{Email} ({Name})";
+    public string Email { get; }
+    public string Name { get; }
+    /// <summary>"Tech", "Client", or "External".</summary>
+    public string Kind { get; }
+
+    /// <summary>Text shown in the search dropdown (external option reads "Add External Recipient: ...").</summary>
+    public string DropdownLabel { get; }
+
+    /// <summary>Text shown on the recipient chip once added.</summary>
+    public string Label { get; }
 }

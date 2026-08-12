@@ -312,7 +312,8 @@ internal static class DemoData
         "<li>Stage the new firmware on switch <b>A2</b> first<br /></li>" +
         "<li>Verify VLAN tables &amp; uplinks after reboot<br /></li>" +
         "<li>Roll out to the remaining switches</li></ol>" +
-        "Exact versions are in the <a href=\"https://example.com/firmware/switches\">firmware matrix</a>.";
+        "Exact versions are in the <a href=\"https://example.com/firmware/switches\">firmware matrix</a>.<br />" +
+        "Contact: <a href=\"mailto:helpdesk&#64;example.com\">helpdesk&#64;example.com</a>";
 
     public static List<TicketNote> NotesFor(int ticketId)
     {

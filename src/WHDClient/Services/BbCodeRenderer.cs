@@ -157,8 +157,33 @@ public static partial class BbCodeRenderer
             && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeMailto))
         {
             link.Click += (_, _) => Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
+            link.ContextMenu = BuildLinkMenu(uri);
         }
         return link;
+    }
+
+    /// <summary>Right-click menu so links can be copied to the clipboard (mailto: stripped for emails).</summary>
+    private static ContextMenu BuildLinkMenu(Uri uri)
+    {
+        // For email links the useful copy is the bare address, not the "mailto:" wrapper.
+        var copyText = uri.Scheme == Uri.UriSchemeMailto ? uri.AbsoluteUri["mailto:".Length..] : uri.AbsoluteUri;
+        var menu = new ContextMenu();
+        var copyLink = new MenuItem { Header = "Copy link" };
+        copyLink.Click += (_, _) => CopyToClipboard(copyText);
+        menu.Items.Add(copyLink);
+        return menu;
+    }
+
+    private static void CopyToClipboard(string text)
+    {
+        try
+        {
+            System.Windows.Clipboard.SetText(text);
+        }
+        catch
+        {
+            // Clipboard busy (held by another app) — nothing sensible to do.
+        }
     }
 
     private static System.Windows.Controls.Image? CreateImage(string url)
