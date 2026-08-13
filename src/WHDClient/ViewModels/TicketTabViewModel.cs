@@ -69,17 +69,12 @@ public partial class TicketTabViewModel : TabViewModelBase
     [ObservableProperty] private bool _replyEmailTech;
     [ObservableProperty] private bool _replyAlsoSetStatus;
 
-// Cc recipients on the reply (searched from techs + clients, sent as email addresses)
-[ObservableProperty] private string _ccSearchText = "";
-[ObservableProperty] private bool _isSearchingCc;
-[ObservableProperty] private CcRecipient? _selectedCcResult;
-public ObservableCollection<CcRecipient> CcResults { get; } = new();
-public ObservableCollection<CcRecipient> CcRecipients { get; } = new();
-
-/// <summary>True while no un-added text sits in the Cc box; the reply can be posted.</summary>
-public bool IsCcTextEmpty => string.IsNullOrEmpty(CcSearchText);
-
-partial void OnCcSearchTextChanged(string value) => OnPropertyChanged(nameof(IsCcTextEmpty));
+    // Cc recipients on the ticket (searched from techs + clients, saved with Save changes)
+    [ObservableProperty] private string _ccSearchText = "";
+    [ObservableProperty] private bool _isSearchingCc;
+    [ObservableProperty] private CcRecipient? _selectedCcResult;
+    public ObservableCollection<CcRecipient> CcResults { get; } = new();
+    public ObservableCollection<CcRecipient> CcRecipients { get; } = new();
 
     /// <summary>Raised (on the UI thread) after a Cc search completes; the view opens the results dropdown.</summary>
     public event Action? CcSearchCompleted;
@@ -199,6 +194,7 @@ partial void OnCcSearchTextChanged(string value) => OnPropertyChanged(nameof(IsC
             Ticket = ticket;
             Header = $"#{ticket.Id} {Truncate(ticket.DisplaySubject, 30)}";
             HasDistinctDetail = ComputeHasDistinctDetail(ticket);
+            LoadCcRecipients(ticket);
 
             var notes = await notesTask;
             // /TicketNotes omits attachments entirely; the style=details ticket response
@@ -307,6 +303,14 @@ partial void OnCcSearchTextChanged(string value) => OnPropertyChanged(nameof(IsC
 
     private static string Truncate(string s, int n) => s.Length <= n ? s : s[..n] + "…";
 
+    /// <summary>Builds the Cc recipient list from the ticket's comma-joined address field.</summary>
+    private void LoadCcRecipients(Ticket ticket)
+    {
+        CcRecipients.Clear();
+        foreach (var email in (ticket.CcAddressesForTech ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            CcRecipients.Add(new CcRecipient(email, email, "External", label: email));
+    }
+
     /// <summary>True when the detail says something the subject doesn't already say.</summary>
     private static bool ComputeHasDistinctDetail(Ticket t)
     {
@@ -350,6 +354,15 @@ partial void OnCcSearchTextChanged(string value) => OnPropertyChanged(nameof(IsC
             else if (SelectedTech != null && SelectedTech.Id != Ticket.ClientTech?.Id)
                 payload["clientTech"] = new EntityRef(SelectedTech.Id, "Tech");
 
+            // Cc recipients: sent when the address list changed since the ticket was loaded.
+            var originalCc = Ticket.CcAddressesForTech ?? "";
+            var currentCc = string.Join(",", CcRecipients.Select(r => r.Email));
+            if (!string.Equals(originalCc, currentCc, StringComparison.OrdinalIgnoreCase))
+            {
+                payload["ccAddressesForTech"] = currentCc;
+                payload["emailCc"] = currentCc.Length > 0;
+            }
+
             // "Send update email" unchecked suppresses the client/tech notification on this save.
             // sendEmail only appears in the payload when emails are NOT wanted, so an ordinary
             // save keeps the server's default behavior exactly as before.
@@ -392,10 +405,6 @@ partial void OnCcSearchTextChanged(string value) => OnPropertyChanged(nameof(IsC
                 IsSolution = ReplyIsSolution,
                 EmailClient = ReplyEmailClient,
                 EmailTech = ReplyEmailTech,
-                EmailCc = CcRecipients.Count > 0,
-                CcAddressesForTech = CcRecipients.Count > 0
-                    ? string.Join(",", CcRecipients.Select(r => r.Email))
-                    : null,
                 StatusTypeId = ReplyAlsoSetStatus && SelectedStatus != null ? SelectedStatus.Id : null
             };
             var created = await _session.Tickets.AddTechNoteAsync(note);
@@ -427,7 +436,6 @@ partial void OnCcSearchTextChanged(string value) => OnPropertyChanged(nameof(IsC
 
             ReplyText = "";
             PendingReplyAttachments.Clear();
-            CcRecipients.Clear();
             InfoMessage = uploadFailures.Count == 0
                 ? "Note added."
                 : $"Note added, but {uploadFailures.Count} attachment(s) failed: {string.Join("; ", uploadFailures)}";

@@ -268,6 +268,7 @@ internal static class DemoData
         if (s.Id == 1001)
         {
             ticket.Room = "Library workroom";
+            ticket.CcAddressesForTech = "helpdesk@example.com";
             ticket.Attachments = new List<TicketAttachment>
             {
                 new() { Id = 801, Type = "TicketAttachment", FileName = "cart4-inventory.xlsx", UploadDate = reported.AddHours(1), Size = 18432 },
@@ -399,6 +400,13 @@ internal static class DemoData
         {
             var reqType = RequestTypes.FirstOrDefault(r => r.Id == IntOf(pt));
             if (reqType != null) ticket.ProblemType = reqType;
+            ticket.LastUpdatedUtc = DateTimeOffset.UtcNow;
+            ticket.LastUpdated = DateTimeOffset.UtcNow;
+            ticket.PrettyLastUpdated = "just now";
+        }
+        if (doc.RootElement.TryGetProperty("ccAddressesForTech", out var cc))
+        {
+            ticket.CcAddressesForTech = cc.ValueKind == JsonValueKind.String ? cc.GetString() : null;
             ticket.LastUpdatedUtc = DateTimeOffset.UtcNow;
             ticket.LastUpdated = DateTimeOffset.UtcNow;
             ticket.PrettyLastUpdated = "just now";

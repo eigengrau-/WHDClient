@@ -116,6 +116,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                         <StackPanel Margin="0,0,16,0">
@@ -148,13 +149,56 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"
-                                VerticalAlignment="Center" Margin="0,6,0,0">
-                        <CheckBox Content="Send update email" IsChecked="{Binding SendUpdateEmail}"
-                                  ToolTip="When unchecked, the client and tech are not emailed about these changes"
-                                  VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <Button Content="Save changes" Style="{DynamicResource AccentButton}"
-                                Command="{Binding SaveChangesCommand}" Padding="14,6"/>
+                    <!-- CC search sits on the same line as Send update email / Save changes -->
+                    <DockPanel Grid.Row="1" Margin="0,8,0,0">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <CheckBox Content="Send update email" IsChecked="{Binding SendUpdateEmail}"
+                                      ToolTip="When unchecked, the client and tech are not emailed about these changes"
+                                      VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <Button Content="Save changes" Style="{DynamicResource AccentButton}"
+                                    Command="{Binding SaveChangesCommand}" Padding="14,6"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="CC" Style="{DynamicResource FieldLabel}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBox Width="200" Text="{Binding CcSearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     LostKeyboardFocus="CcSearchBox_LostKeyboardFocus" VerticalContentAlignment="Center">
+                                <TextBox.InputBindings>
+                                    <KeyBinding Key="Enter" Command="{Binding SearchCcCommand}"/>
+                                </TextBox.InputBindings>
+                            </TextBox>
+                            <Button x:Name="FindCcButton" Content="Find" Command="{Binding SearchCcCommand}"
+                                    AutomationProperties.Name="Find Cc" Margin="6,0,0,0" Padding="10,3"/>
+                        </StackPanel>
+                    </DockPanel>
+
+                    <!-- Cc results dropdown + recipient chips -->
+                    <StackPanel Grid.Row="2" Margin="0,4,0,0">
+                        <ProgressBar IsIndeterminate="True" Height="3" Margin="0,2,0,0"
+                                     Visibility="{Binding IsSearchingCc, Converter={StaticResource BoolToVisConverter}}"/>
+                        <ComboBox x:Name="CcCombo" ItemsSource="{Binding CcResults}" SelectedItem="{Binding SelectedCcResult}"
+                                  DisplayMemberPath="DropdownLabel" Margin="0,4,0,0" MaxDropDownHeight="240"
+                                  Visibility="{Binding CcResults.Count, Converter={StaticResource PositiveIntToVisConverter}}"/>
+                        <ItemsControl ItemsSource="{Binding CcRecipients}" Margin="0,4,0,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource Panel2Brush}" BorderBrush="{DynamicResource BorderBrushDim}"
+                                            BorderThickness="1" CornerRadius="3" Padding="6,1" Margin="0,0,4,2">
+                                        <DockPanel>
+                                            <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="{DynamicResource FontSize10}"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    Command="{Binding DataContext.RemoveCcRecipientCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                            <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSize11}" VerticalAlignment="Center"/>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </Grid>
 
@@ -318,52 +362,6 @@
                             <CheckBox Content="Also set status" IsChecked="{Binding ReplyAlsoSetStatus}" Margin="0,0,10,2"/>
                         </WrapPanel>
 
-                        <!-- Cc recipients: search techs/clients, pick from the dropdown, accumulates as chips -->
-                        <StackPanel Margin="0,4,0,0">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Cc:" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Text="{Binding CcSearchText, UpdateSourceTrigger=PropertyChanged}"
-                                         LostKeyboardFocus="CcSearchBox_LostKeyboardFocus" Margin="6,0,0,0">
-                                    <TextBox.InputBindings>
-                                        <KeyBinding Key="Enter" Command="{Binding SearchCcCommand}"/>
-                                    </TextBox.InputBindings>
-                                </TextBox>
-                                <Button Grid.Column="2" x:Name="FindCcButton" Content="Find" Command="{Binding SearchCcCommand}"
-                                        AutomationProperties.Name="Find Cc" Margin="6,0,0,0" Padding="10,3"/>
-                            </Grid>
-                            <ProgressBar IsIndeterminate="True" Height="3" Margin="24,2,0,0"
-                                         Visibility="{Binding IsSearchingCc, Converter={StaticResource BoolToVisConverter}}"/>
-                            <ComboBox x:Name="CcCombo" ItemsSource="{Binding CcResults}" SelectedItem="{Binding SelectedCcResult}"
-                                      DisplayMemberPath="DropdownLabel" Margin="24,4,0,0" MaxDropDownHeight="240"
-                                      Visibility="{Binding CcResults.Count, Converter={StaticResource PositiveIntToVisConverter}}"/>
-                            <ItemsControl ItemsSource="{Binding CcRecipients}" Margin="24,4,0,0">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="{DynamicResource Panel2Brush}" BorderBrush="{DynamicResource BorderBrushDim}"
-                                                BorderThickness="1" CornerRadius="3" Padding="6,1" Margin="0,0,4,2">
-                                            <DockPanel>
-                                                <Button Content="✕" DockPanel.Dock="Right" Padding="5,0" FontSize="{DynamicResource FontSize10}"
-                                                        Background="Transparent" BorderThickness="0"
-                                                        Command="{Binding DataContext.RemoveCcRecipientCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                        CommandParameter="{Binding}"/>
-                                                <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSize11}" VerticalAlignment="Center"/>
-                                            </DockPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-
                         <!-- Note attachments: staged here, uploaded onto the note when it is posted -->
                         <ItemsControl ItemsSource="{Binding PendingReplyAttachments}" Margin="0,4,0,0">
                             <ItemsControl.ItemTemplate>
@@ -383,9 +381,7 @@
                         <!-- Add file and Add note on one line -->
                         <DockPanel Margin="0,6,0,0">
                             <Button Content="Add note" Style="{DynamicResource AccentButton}" DockPanel.Dock="Right"
-                                    Command="{Binding ReplyCommand}" Padding="12,5"
-                                    IsEnabled="{Binding IsCcTextEmpty}"
-                                    ToolTip="Unresolved text in the Cc box must be added or cleared before posting"/>
+                                    Command="{Binding ReplyCommand}" Padding="12,5"/>
                             <Button Content="+ Add file" Command="{Binding AddReplyAttachmentsCommand}" AutomationProperties.Name="Add file"
                                     Padding="8,2" HorizontalAlignment="Left"/>
                         </DockPanel>

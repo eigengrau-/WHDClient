@@ -38,6 +38,9 @@ public class Ticket
     [JsonPropertyName("latestNote")] public TicketNote? LatestNote { get; set; }
     [JsonPropertyName("attachments")] public List<TicketAttachment>? Attachments { get; set; }
 
+    /// <summary>Comma-joined email addresses Cc'd on this ticket (settable via update).</summary>
+    [JsonPropertyName("ccAddressesForTech")] public string? CcAddressesForTech { get; set; }
+
     /// <summary>
     /// Note stubs embedded in the style=details ticket response. Unlike the /TicketNotes
     /// endpoint (which omits attachments entirely), these carry their attachments — the
