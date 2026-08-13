@@ -19,16 +19,14 @@ public partial class MainWindow : Window
         DarkTitleBar.Apply(this);
         // Keep the toggle's visual state in sync whenever the popup closes.
         Popup.Closed += (_, _) => NotifyToggle.IsChecked = false;
-        // With StaysOpen=True the popup only closes explicitly: a click anywhere in the
-        // window outside the toggle (or the toggle itself) closes it.
-        PreviewMouseLeftButtonDown += (_, e) =>
-        {
-            if (!Popup.IsOpen) return;
-            if (e.OriginalSource is DependencyObject d && NotifyToggle.IsAncestorOf(d)) return;
-            Popup.IsOpen = false;
-            NotifyToggle.IsChecked = false;
-        };
+        // StaysOpen=False closes the popup on any outside click (including a click on the
+        // toggle, which the popup's mouse capture routes through PopupRoot). Capture the
+        // open state here, before that close, so the toggle's Click can tell "close" from
+        // "open" without reopening.
+        PreviewMouseLeftButtonDown += (_, _) => _notifyPopupWasOpen = Popup.IsOpen;
     }
+
+    private bool _notifyPopupWasOpen;
 
     private void SidebarToggle_Checked(object sender, RoutedEventArgs e)
     {
@@ -92,15 +90,16 @@ public partial class MainWindow : Window
     /// <summary>Opens/closes the notification popup anchored at the expanded toggle.</summary>
     private void NotifyToggle_Click(object sender, RoutedEventArgs e)
     {
-        if (NotifyToggle.IsChecked == true)
+        if (_notifyPopupWasOpen)
+        {
+            // This click closed the popup (StaysOpen ran on mouse-down); keep the toggle off.
+            NotifyToggle.IsChecked = false;
+        }
+        else
         {
             Popup.PlacementTarget = NotifyToggle;
             Popup.HorizontalOffset = 0;
             Popup.IsOpen = true;
-        }
-        else
-        {
-            Popup.IsOpen = false;
         }
     }
 
