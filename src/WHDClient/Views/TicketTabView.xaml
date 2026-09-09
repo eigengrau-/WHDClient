@@ -62,8 +62,14 @@
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,1,22,1">
                             <Label Content="LOCATION" Style="{DynamicResource PropertyLabel}" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding Ticket.Location.DisplayName, Mode=OneWay}" Style="{DynamicResource PropertyBox}"
-                                     MinWidth="140" Margin="6,0,0,0"/>
+                            <ComboBox ItemsSource="{Binding Locations}" SelectedItem="{Binding SelectedLocation}"
+                                      MinWidth="180" Margin="6,0,0,0" VerticalAlignment="Center">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayName}" TextWrapping="NoWrap"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,1,22,1">
                             <Label Content="REPORTED" Style="{DynamicResource PropertyLabel}" VerticalAlignment="Center"/>

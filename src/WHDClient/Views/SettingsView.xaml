@@ -96,6 +96,9 @@
                                 <TextBlock Text="Font size" Style="{DynamicResource DimText}" Margin="0,8,0,2"/>
                                 <ComboBox ItemsSource="{Binding FontScaleOptions}" SelectedItem="{Binding FontScale}"
                                           Width="140" HorizontalAlignment="Left"/>
+                                <CheckBox Content="Show status as text in ticket lists" IsChecked="{Binding StatusAsText}" Margin="0,8,0,0"/>
+                                <CheckBox Content="Show priority as text in ticket lists" IsChecked="{Binding PriorityAsText}"/>
+                                <CheckBox Content="Re-open previous tabs on startup" IsChecked="{Binding RestoreTabsOnStartup}"/>
                             </StackPanel>
                         </Border>
                         <Border Background="{DynamicResource PanelBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,10">

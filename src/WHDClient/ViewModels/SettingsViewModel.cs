@@ -33,6 +33,9 @@ public partial class SettingsViewModel : TabViewModelBase
         NotifyAssignedToMe = settings.Settings.NotifyAssignedToMe;
         NotifyMyTicketUpdated = settings.Settings.NotifyMyTicketUpdated;
         NotifyNewMatching = settings.Settings.NotifyNewMatching;
+        StatusAsText = settings.Settings.StatusAsText;
+        PriorityAsText = settings.Settings.PriorityAsText;
+        RestoreTabsOnStartup = settings.Settings.RestoreTabsOnStartup;
         FontScale = settings.Settings.FontScale;
         Theme = settings.Settings.Theme;
         HasRememberedKey = settings.GetApiKey() != null;
@@ -46,6 +49,9 @@ public partial class SettingsViewModel : TabViewModelBase
     [ObservableProperty] private bool _notifyAssignedToMe;
     [ObservableProperty] private bool _notifyMyTicketUpdated;
     [ObservableProperty] private bool _notifyNewMatching;
+    [ObservableProperty] private bool _statusAsText;
+    [ObservableProperty] private bool _priorityAsText;
+    [ObservableProperty] private bool _restoreTabsOnStartup;
     [ObservableProperty] private string _theme;
     [ObservableProperty] private string _fontScale;
     [ObservableProperty] private bool _hasRememberedKey;
@@ -93,6 +99,9 @@ public partial class SettingsViewModel : TabViewModelBase
     partial void OnNotifyAssignedToMeChanged(bool value) => _settings.Settings.NotifyAssignedToMe = value;
     partial void OnNotifyMyTicketUpdatedChanged(bool value) => _settings.Settings.NotifyMyTicketUpdated = value;
     partial void OnNotifyNewMatchingChanged(bool value) => _settings.Settings.NotifyNewMatching = value;
+    partial void OnStatusAsTextChanged(bool value) => _settings.Settings.StatusAsText = value;
+    partial void OnPriorityAsTextChanged(bool value) => _settings.Settings.PriorityAsText = value;
+    partial void OnRestoreTabsOnStartupChanged(bool value) => _settings.Settings.RestoreTabsOnStartup = value;
 
     [RelayCommand]
     private void Save()

@@ -110,6 +110,10 @@ public class Location
 
     [JsonIgnore]
     public string DisplayName => LocationName ?? $"location {Id}";
+
+    /// <summary>Edit sentinel for "(no location)" — clears the ticket's location. Not a real location.</summary>
+    [JsonIgnore]
+    public static Location NoLocation { get; } = new() { Id = -1, LocationName = "(no location)" };
 }
 
 public class Department

@@ -16,7 +16,12 @@ public class InverseBoolConverter : IValueConverter
 public class BoolToVisConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        => value is bool b && b ? Visibility.Visible : Visibility.Collapsed;
+    {
+        var vis = value is bool b && b ? Visibility.Visible : Visibility.Collapsed;
+        if (parameter is string s && s.Equals("invert", StringComparison.OrdinalIgnoreCase))
+            vis = vis == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        return vis;
+    }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotSupportedException();

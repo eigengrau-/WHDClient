@@ -79,18 +79,21 @@ public partial class MainViewModel : ObservableObject
         _ = CheckForUpdatesAsync();
 
         // Restore the tabs that were open when the app was last closed.
-        foreach (var key in _settings.Settings.OpenTabs)
+        if (_settings.Settings.RestoreTabsOnStartup)
         {
-            if (key.Equals("newticket", StringComparison.OrdinalIgnoreCase))
-                OpenNewTicketCommand.Execute(null);
-            else if (key.StartsWith("ticket:", StringComparison.OrdinalIgnoreCase)
-                     && int.TryParse(key[7..], out var tid))
-                OpenTicket(tid);
-            else
-                ShowPage(key);
+            foreach (var key in _settings.Settings.OpenTabs)
+            {
+                if (key.Equals("newticket", StringComparison.OrdinalIgnoreCase))
+                    OpenNewTicketCommand.Execute(null);
+                else if (key.StartsWith("ticket:", StringComparison.OrdinalIgnoreCase)
+                         && int.TryParse(key[7..], out var tid))
+                    OpenTicket(tid);
+                else
+                    ShowPage(key);
+            }
+            var selected = Tabs.FirstOrDefault(t => TabKey(t) == _settings.Settings.SelectedTab);
+            if (selected != null) SelectedTab = selected;
         }
-        var selected = Tabs.FirstOrDefault(t => TabKey(t) == _settings.Settings.SelectedTab);
-        if (selected != null) SelectedTab = selected;
 
         // Dev/test hook: WHD_START_PAGE=mine|search|queue|settings|newticket|ticket:<id>
         var startPage = Environment.GetEnvironmentVariable("WHD_START_PAGE");

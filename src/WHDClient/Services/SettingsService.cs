@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace WHDClient.Services;
 
@@ -30,7 +31,7 @@ public class ReplyTemplate
     public string Text { get; set; } = "";
 }
 
-public class AppSettings
+public class AppSettings : ObservableObject
 {
     public const string DefaultServerUrl = "";
 
@@ -48,6 +49,16 @@ public class AppSettings
     public string Theme { get; set; } = "Dark";
     /// <summary>Font size preset: "Small", "Medium", or "Large".</summary>
     public string FontScale { get; set; } = ThemeService.MediumScale;
+    /// <summary>Re-open the tabs that were open when the app was last closed.</summary>
+    public bool RestoreTabsOnStartup { get; set; } = true;
+
+    private bool _statusAsText;
+    /// <summary>Show the status name as colored text in ticket grids instead of a dot.</summary>
+    public bool StatusAsText { get => _statusAsText; set => SetProperty(ref _statusAsText, value); }
+
+    private bool _priorityAsText;
+    /// <summary>Show the priority name as colored text in ticket grids instead of a dot.</summary>
+    public bool PriorityAsText { get => _priorityAsText; set => SetProperty(ref _priorityAsText, value); }
     public List<SavedFilter> SavedFilters { get; set; } = new();
     /// <summary>Ticket ids the user has bookmarked.</summary>
     public List<int> BookmarkedTicketIds { get; set; } = new();

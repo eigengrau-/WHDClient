@@ -16,6 +16,7 @@ public partial class TicketRow : ObservableObject
     public string Status { get; init; } = "";
     public string Priority { get; init; } = "";
     public string Location { get; init; } = "";
+    public string RequestType { get; init; } = "";
     public string Tech { get; init; } = "";
     public string LastUpdated { get; init; } = "";
     public DateTimeOffset? LastUpdatedStamp { get; init; }
@@ -33,6 +34,7 @@ public partial class TicketRow : ObservableObject
         Status = t.StatusType?.DisplayName ?? "",
         Priority = t.PriorityType?.DisplayName ?? "",
         Location = t.Location?.DisplayName ?? "",
+        RequestType = t.ProblemType?.DisplayName ?? "",
         Tech = t.ClientTech?.DisplayName ?? "",
         LastUpdatedStamp = t.EffectiveLastUpdated,
         LastUpdated = t.EffectiveLastUpdated?.ToString("yy-MM-dd HH:mm") ?? t.PrettyLastUpdated ?? "",

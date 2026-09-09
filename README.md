@@ -45,7 +45,7 @@ Taken in demo mode (`WHD_DEMO=1`): every name, location, and ticket is fabricate
 
 ![Notifications](docs/screenshots/notifications.png)
 
-**Settings**: connection, polling, page size, notification alerts, and update checking
+**Settings**: connection, polling, page size, notification alerts, update checking, status/priority text display, and tab restore on startup
 
 ![Settings](docs/screenshots/settings.png)
 

@@ -39,25 +39,40 @@
                 <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="60" ElementStyle="{DynamicResource CellText}"/>
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="3*" ElementStyle="{DynamicResource CellText}"/>
                 <DataGridTextColumn Header="Client" Binding="{Binding Client}" Width="*" ElementStyle="{DynamicResource CellText}"/>
-                <DataGridTemplateColumn Header="Status" Width="SizeToHeader" SortMemberPath="Status">
+                <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="Status">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Ellipse Width="12" Height="12" HorizontalAlignment="Center"
-                                     Fill="{Binding Status, Converter={StaticResource StatusToBrushConverter}}"
-                                     ToolTip="{Binding Status}"/>
+                            <Grid>
+                                <Ellipse Width="12" Height="12" HorizontalAlignment="Center"
+                                         Fill="{Binding Status, Converter={StaticResource StatusToBrushConverter}}"
+                                         ToolTip="{Binding Status}"
+                                         Visibility="{Binding Source={StaticResource AppSettings}, Path=StatusAsText, Converter={StaticResource BoolToVisConverter}, ConverterParameter=invert}"/>
+                                <TextBlock Text="{Binding Status}" FontWeight="SemiBold" HorizontalAlignment="Center" TextWrapping="NoWrap"
+                                           Foreground="{Binding Status, Converter={StaticResource StatusToBrushConverter}}"
+                                           ToolTip="{Binding Status}"
+                                           Visibility="{Binding Source={StaticResource AppSettings}, Path=StatusAsText, Converter={StaticResource BoolToVisConverter}}"/>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Priority" Width="SizeToHeader" SortMemberPath="Priority">
+                <DataGridTemplateColumn Header="Priority" Width="Auto" SortMemberPath="Priority">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Ellipse Width="12" Height="12" HorizontalAlignment="Center"
-                                     Fill="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}"
-                                     ToolTip="{Binding Priority}"/>
+                            <Grid>
+                                <Ellipse Width="12" Height="12" HorizontalAlignment="Center"
+                                         Fill="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}"
+                                         ToolTip="{Binding Priority}"
+                                         Visibility="{Binding Source={StaticResource AppSettings}, Path=PriorityAsText, Converter={StaticResource BoolToVisConverter}, ConverterParameter=invert}"/>
+                                <TextBlock Text="{Binding Priority}" FontWeight="SemiBold" HorizontalAlignment="Center" TextWrapping="NoWrap"
+                                           Foreground="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}"
+                                           ToolTip="{Binding Priority}"
+                                           Visibility="{Binding Source={StaticResource AppSettings}, Path=PriorityAsText, Converter={StaticResource BoolToVisConverter}}"/>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*" ElementStyle="{DynamicResource CellText}"/>
+                <DataGridTextColumn Header="Request Type" Binding="{Binding RequestType}" SortMemberPath="RequestType" Width="*" ElementStyle="{DynamicResource CellText}"/>
                 <DataGridTextColumn Header="Updated" Binding="{Binding LastUpdated}" Width="110" ElementStyle="{DynamicResource CellText}"/>
                 <DataGridTextColumn Header="Reported" Binding="{Binding ReportDate}" Width="110" ElementStyle="{DynamicResource CellText}"/>
             </DataGrid.Columns>

@@ -96,6 +96,8 @@ public partial class App : Application
             var settings = Services.GetRequiredService<SettingsService>();
             settings.Load();
             Log($"settings loaded; hasKey={settings.GetApiKey() != null}");
+            // Exposed for XAML bindings that react to settings changes live (e.g. status-as-text).
+            Resources["AppSettings"] = settings.Settings;
 
             // Apply the saved theme/font before any window is created so the first paint is correct.
             ThemeService.Apply(settings.Settings.Theme, settings.Settings.FontScale);

@@ -13,7 +13,7 @@ public class GridLayoutService
 {
     /// <summary>All toggleable column headers across the ticket grids.</summary>
     public static readonly string[] KnownHeaders =
-        { "#", "Subject", "Client", "Status", "Priority", "Tech", "Location", "Reported", "Updated" };
+        { "#", "Subject", "Client", "Status", "Priority", "Tech", "Location", "Request Type", "Reported", "Updated" };
 
     private readonly SettingsService _settings;
     private static readonly List<WeakReference<DataGrid>> _live = new();
@@ -37,19 +37,38 @@ public class GridLayoutService
     public void Apply(DataGrid grid, string? key)
     {
         ApplyVisibility(grid);
-        if (key == null || !_settings.Settings.GridColumnLayouts.TryGetValue(key, out var saved)) return;
+        if (key != null && _settings.Settings.GridColumnLayouts.TryGetValue(key, out var saved))
+        {
+            foreach (var col in grid.Columns)
+            {
+                var state = saved.FirstOrDefault(s => s.Header == HeaderOf(col));
+                if (state?.Width is { } w && TryParseLength(w, out var len)) col.Width = len;
+            }
+            // Assign in ascending saved order so WPF resolves collisions deterministically.
+            foreach (var state in saved.OrderBy(s => s.DisplayIndex))
+            {
+                var col = grid.Columns.FirstOrDefault(c => HeaderOf(c) == state.Header);
+                if (col != null) col.DisplayIndex = state.DisplayIndex;
+            }
+        }
+        NormalizeAutoColumn(grid, "Status");
+        NormalizeAutoColumn(grid, "Priority");
+    }
 
-        foreach (var col in grid.Columns)
-        {
-            var state = saved.FirstOrDefault(s => s.Header == HeaderOf(col));
-            if (state?.Width is { } w && TryParseLength(w, out var len)) col.Width = len;
-        }
-        // Assign in ascending saved order so WPF resolves collisions deterministically.
-        foreach (var state in saved.OrderBy(s => s.DisplayIndex))
-        {
-            var col = grid.Columns.FirstOrDefault(c => HeaderOf(c) == state.Header);
-            if (col != null) col.DisplayIndex = state.DisplayIndex;
-        }
+    /// <summary>
+    /// Keeps the Status/Priority columns sized to BOTH header and cells, so the dot↔text
+    /// display setting never clips. Forces a re-measure even when the column is already
+    /// Auto (the DataGrid caches auto-fit widths per control instance). Columns the user
+    /// resized to a pixel/star width are left alone.
+    /// </summary>
+    private static void NormalizeAutoColumn(DataGrid grid, string header)
+    {
+        var col = grid.Columns.FirstOrDefault(c => HeaderOf(c) == header);
+        if (col == null) return;
+        if (!col.Width.IsSizeToCells && !col.Width.IsSizeToHeader && !col.Width.IsAuto) return;
+        // Assigning an equal DataGridLength is a no-op, so nudge the width first.
+        col.Width = new DataGridLength(1, DataGridLengthUnitType.Pixel);
+        col.Width = DataGridLength.Auto;
     }
 
     /// <summary>Records the grid's current column order and widths in settings (in memory; persisted on save).</summary>

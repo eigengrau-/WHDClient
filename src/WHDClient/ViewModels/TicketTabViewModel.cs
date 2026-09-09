@@ -45,6 +45,7 @@ public partial class TicketTabViewModel : TabViewModelBase
     [ObservableProperty] private StatusType? _selectedStatus;
     [ObservableProperty] private PriorityType? _selectedPriority;
     [ObservableProperty] private Tech? _selectedTech;
+    [ObservableProperty] private Location? _selectedLocation;
 
     /// <summary>
     /// When unchecked, saving field changes sends no update email to the client/tech
@@ -55,6 +56,7 @@ public partial class TicketTabViewModel : TabViewModelBase
     public ObservableCollection<StatusType> StatusTypes { get; } = new();
     public ObservableCollection<PriorityType> PriorityTypes { get; } = new();
     public ObservableCollection<Tech> Techs { get; } = new();
+    public ObservableCollection<Location> Locations { get; } = new();
 
     // Request type: cascading picker. The full list is slow (~3s) so it loads lazily
     // in the background, after the ticket renders, and pre-selects the current type.
@@ -250,6 +252,18 @@ public partial class TicketTabViewModel : TabViewModelBase
                 Techs.Add(ticket.ClientTech);
                 SelectedTech = ticket.ClientTech;
             }
+            if (!Locations.Contains(Location.NoLocation))
+                Locations.Insert(0, Location.NoLocation);
+            var locationId = ticket.Location?.Id ?? ticket.LocationId;
+            SelectedLocation = locationId == null
+                ? Location.NoLocation
+                : Locations.FirstOrDefault(l => l.Id == locationId);
+            if (SelectedLocation == null && ticket.Location != null)
+            {
+                // The ticket's location may be missing from the lookup list — keep it visible and selected anyway.
+                Locations.Add(ticket.Location);
+                SelectedLocation = ticket.Location;
+            }
             IsBookmarked = _settings.Settings.BookmarkedTicketIds.Contains(TicketId);
         }
         catch (Exception ex)
@@ -271,6 +285,7 @@ public partial class TicketTabViewModel : TabViewModelBase
             // "Not Assigned" (clears clientTech) at the top, then the real techs.
             Techs.Add(Tech.NotAssigned);
             foreach (var t in await _session.Lookups.GetActiveTechsAsync()) Techs.Add(t);
+            foreach (var l in await _session.Lookups.GetLocationsAsync()) Locations.Add(l);
         }
     }
 
@@ -353,6 +368,13 @@ public partial class TicketTabViewModel : TabViewModelBase
             }
             else if (SelectedTech != null && SelectedTech.Id != Ticket.ClientTech?.Id)
                 payload["clientTech"] = new EntityRef(SelectedTech.Id, "Tech");
+            if (ReferenceEquals(SelectedLocation, Location.NoLocation))
+            {
+                if (Ticket.Location != null || Ticket.LocationId != null)
+                    payload["location"] = null; // clears the ticket's location
+            }
+            else if (SelectedLocation != null && SelectedLocation.Id != (Ticket.Location?.Id ?? Ticket.LocationId))
+                payload["location"] = new EntityRef(SelectedLocation.Id, "Location");
 
             // Cc recipients: sent when the address list changed since the ticket was loaded.
             var originalCc = Ticket.CcAddressesForTech ?? "";
