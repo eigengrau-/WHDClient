@@ -83,9 +83,10 @@ public class BbCodeParserTests
     {
         var blocks = BbCodeParser.Parse("[quote]said [b]this[/b][/quote]");
         var q = Assert.IsType<BbQuote>(Assert.Single(blocks));
-        Assert.Equal(2, q.Inlines.Count);
-        Assert.Equal(new BbText("said "), q.Inlines[0]);
-        Assert.Equal(new BbText("this", Bold: true), q.Inlines[1]);
+        var p = Assert.IsType<BbParagraph>(Assert.Single(q.Blocks));
+        Assert.Equal(2, p.Inlines.Count);
+        Assert.Equal(new BbText("said "), p.Inlines[0]);
+        Assert.Equal(new BbText("this", Bold: true), p.Inlines[1]);
     }
 
     [Fact]
@@ -144,5 +145,49 @@ public class BbCodeParserTests
         Assert.IsType<BbParagraph>(blocks[0]);
         Assert.IsType<BbCodeBlock>(blocks[1]);
         Assert.IsType<BbParagraph>(blocks[2]);
+    }
+
+    [Fact]
+    public void HtmlEntities_AreDecoded()
+    {
+        var blocks = BbCodeParser.Parse("It&#39;s a &quot;test&quot; &amp; more");
+        var p = Assert.IsType<BbParagraph>(Assert.Single(blocks));
+        Assert.Equal(new BbText("It's a \"test\" & more"), Assert.Single(p.Inlines));
+    }
+
+    [Fact]
+    public void Table_ParsesRowsAndCells()
+    {
+        var blocks = BbCodeParser.Parse(
+            "[table][tr][th]Name[/th][th]Value[/th][/tr][tr][td]a[/td][td][b]b[/b][/td][/tr][/table]");
+        var table = Assert.IsType<BbTable>(Assert.Single(blocks));
+        Assert.Equal(2, table.Rows.Count);
+        Assert.True(table.Rows[0].Cells[0].Header);
+        Assert.Equal(new BbText("Name"), Assert.Single(table.Rows[0].Cells[0].Inlines));
+        Assert.False(table.Rows[1].Cells[1].Header);
+        Assert.Equal(new BbText("b", Bold: true), Assert.Single(table.Rows[1].Cells[1].Inlines));
+    }
+
+    [Fact]
+    public void Quote_WithNestedBlockTag_ParsesRecursively()
+    {
+        var blocks = BbCodeParser.Parse("[quote]notes:[list][*]one[/list][/quote]");
+        var q = Assert.IsType<BbQuote>(Assert.Single(blocks));
+        Assert.Equal(2, q.Blocks.Count);
+        Assert.IsType<BbParagraph>(q.Blocks[0]);
+        var list = Assert.IsType<BbList>(q.Blocks[1]);
+        Assert.Equal(new BbText("one"), Assert.Single(Assert.Single(list.Items)));
+    }
+
+    [Fact]
+    public void NestedQuotes_ParseFully()
+    {
+        var blocks = BbCodeParser.Parse("[quote]a[quote]b[/quote]c[/quote]");
+        var q = Assert.IsType<BbQuote>(Assert.Single(blocks));
+        Assert.Equal(3, q.Blocks.Count);
+        Assert.Equal(new BbText("a"), Assert.Single(Assert.IsType<BbParagraph>(q.Blocks[0]).Inlines));
+        var inner = Assert.IsType<BbQuote>(q.Blocks[1]);
+        Assert.Equal(new BbText("b"), Assert.Single(Assert.IsType<BbParagraph>(Assert.Single(inner.Blocks)).Inlines));
+        Assert.Equal(new BbText("c"), Assert.Single(Assert.IsType<BbParagraph>(q.Blocks[2]).Inlines));
     }
 }

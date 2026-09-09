@@ -21,14 +21,20 @@ public static partial class BbCodeRenderer
             TextAlignment = TextAlignment.Left
         };
 
-        foreach (var block in RichTextParser.Parse(bbText))
+        AddBlocks(doc.Blocks, RichTextParser.Parse(bbText));
+        return doc;
+    }
+
+    private static void AddBlocks(BlockCollection blocks, List<BbNode> nodes)
+    {
+        foreach (var block in nodes)
         {
             switch (block)
             {
                 case BbParagraph p:
                     var para = new Paragraph { Margin = new Thickness(0, 0, 0, 4) };
                     AddInlines(para, p.Inlines);
-                    doc.Blocks.Add(para);
+                    blocks.Add(para);
                     break;
 
                 case BbList list:
@@ -44,11 +50,11 @@ public static partial class BbCodeRenderer
                         AddInlines(ip, item);
                         wpfList.ListItems.Add(new ListItem(ip));
                     }
-                    doc.Blocks.Add(wpfList);
+                    blocks.Add(wpfList);
                     break;
 
                 case BbCodeBlock code:
-                    doc.Blocks.Add(new Paragraph(new Run(code.Text))
+                    blocks.Add(new Paragraph(new Run(code.Text))
                     {
                         FontFamily = new FontFamily("Consolas"),
                         // No explicit FontSize: inherit from the host RichTextBox so the
@@ -62,7 +68,8 @@ public static partial class BbCodeRenderer
                     break;
 
                 case BbQuote quote:
-                    var qp = new Paragraph
+                    if (quote.Blocks.Count == 0) break;
+                    var section = new Section
                     {
                         FontStyle = FontStyles.Italic,
                         Foreground = Resource<Brush>("TextDimBrush"),
@@ -71,20 +78,45 @@ public static partial class BbCodeRenderer
                         Padding = new Thickness(8, 0, 0, 0),
                         Margin = new Thickness(0, 0, 0, 4)
                     };
-                    AddInlines(qp, quote.Inlines);
-                    doc.Blocks.Add(qp);
+                    AddBlocks(section.Blocks, quote.Blocks);
+                    blocks.Add(section);
+                    break;
+
+                case BbTable table:
+                    if (table.Rows.Count == 0) break;
+                    var wpfTable = new Table { Margin = new Thickness(0, 0, 0, 4) };
+                    var rowGroup = new TableRowGroup();
+                    foreach (var row in table.Rows)
+                    {
+                        var tr = new TableRow();
+                        foreach (var cell in row.Cells)
+                        {
+                            var cp = new Paragraph { Margin = new Thickness(0) };
+                            AddInlines(cp, cell.Inlines);
+                            var tc = new TableCell(cp)
+                            {
+                                BorderBrush = Resource<Brush>("BorderBrushDim"),
+                                BorderThickness = new Thickness(1),
+                                Padding = new Thickness(6, 2, 6, 2)
+                            };
+                            if (cell.Header) tc.FontWeight = FontWeights.SemiBold;
+                            tr.Cells.Add(tc);
+                        }
+                        rowGroup.Rows.Add(tr);
+                    }
+                    wpfTable.RowGroups.Add(rowGroup);
+                    blocks.Add(wpfTable);
                     break;
 
                 case BbImage img:
                     var image = CreateImage(img.Url);
                     if (image != null)
-                        doc.Blocks.Add(new BlockUIContainer(image) { Margin = new Thickness(0, 0, 0, 4) });
+                        blocks.Add(new BlockUIContainer(image) { Margin = new Thickness(0, 0, 0, 4) });
                     else
-                        doc.Blocks.Add(new Paragraph(MakeLink(img.Url, img.Url)) { Margin = new Thickness(0, 0, 0, 4) });
+                        blocks.Add(new Paragraph(MakeLink(img.Url, img.Url)) { Margin = new Thickness(0, 0, 0, 4) });
                     break;
             }
         }
-        return doc;
     }
 
     private static void AddInlines(Paragraph para, List<BbNode> inlines)

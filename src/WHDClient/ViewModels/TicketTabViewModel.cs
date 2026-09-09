@@ -314,13 +314,13 @@ public partial class TicketTabViewModel : TabViewModelBase
     /// <summary>True when the detail says something the subject doesn't already say.</summary>
     private static bool ComputeHasDistinctDetail(Ticket t)
     {
-        var detail = Normalize(t.DisplayDetail);
+        var detail = Normalize(t.DisplayDetail).TrimEnd('.', '…', ' ');
         if (detail.Length == 0) return false;
         // No real subject: the header shows a truncated detail snippet, so always show the full detail.
         if (!t.HasSubject) return true;
         var subject = Normalize(t.DisplaySubject).TrimEnd('.', '…', ' ');
         if (subject.Length == 0) return true;
-        return !detail.StartsWith(subject, StringComparison.OrdinalIgnoreCase)
+        return !detail.Equals(subject, StringComparison.OrdinalIgnoreCase)
             && !subject.StartsWith(detail, StringComparison.OrdinalIgnoreCase);
     }
 

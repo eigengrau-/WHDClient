@@ -86,7 +86,8 @@ public class Ticket
     /// are BBCode; the renderer auto-detects the dialect, so no stripping happens here.
     /// </summary>
     [JsonIgnore]
-    public string RenderableDetail => Detail ?? ShortDetail ?? "";
+    public string RenderableDetail =>
+        !string.IsNullOrWhiteSpace(Detail) ? Detail! : ShortDetail ?? "";
 
     /// <summary>Detail with HTML markup stripped for plain-text display.</summary>
     [JsonIgnore]
@@ -94,7 +95,7 @@ public class Ticket
     {
         get
         {
-            var s = Detail ?? ShortDetail ?? "";
+            var s = !string.IsNullOrWhiteSpace(Detail) ? Detail! : ShortDetail ?? "";
             if (string.IsNullOrEmpty(s)) return "";
             s = System.Text.RegularExpressions.Regex.Replace(s, "<br\\s*/?>", "\n", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             s = System.Text.RegularExpressions.Regex.Replace(s, "<[^>]+>", "");

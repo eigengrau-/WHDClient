@@ -100,8 +100,20 @@ public class HtmlParserTests
     {
         var blocks = HtmlParser.Parse("<blockquote>said <b>this</b></blockquote>");
         var q = Assert.IsType<BbQuote>(Assert.Single(blocks));
-        Assert.Equal(new BbText("said "), q.Inlines[0]);
-        Assert.Equal(new BbText("this", Bold: true), q.Inlines[1]);
+        var p = Assert.IsType<BbParagraph>(Assert.Single(q.Blocks));
+        Assert.Equal(new BbText("said "), p.Inlines[0]);
+        Assert.Equal(new BbText("this", Bold: true), p.Inlines[1]);
+    }
+
+    [Fact]
+    public void Blockquote_WithList_ParsesNestedBlocks()
+    {
+        var blocks = HtmlParser.Parse("<blockquote>notes:<ul><li>one</li></ul></blockquote>");
+        var q = Assert.IsType<BbQuote>(Assert.Single(blocks));
+        Assert.Equal(2, q.Blocks.Count);
+        Assert.IsType<BbParagraph>(q.Blocks[0]);
+        var list = Assert.IsType<BbList>(q.Blocks[1]);
+        Assert.Equal(new BbText("one"), Assert.Single(Assert.Single(list.Items)));
     }
 
     [Fact]
@@ -165,6 +177,14 @@ public class HtmlParserTests
         var blocks = RichTextParser.Parse("[b]bold[/b]");
         var p = Assert.IsType<BbParagraph>(Assert.Single(blocks));
         Assert.Equal(new BbText("bold", Bold: true), Assert.Single(p.Inlines));
+    }
+
+    [Fact]
+    public void Dispatcher_BbCodePath_StillDecodesEntities()
+    {
+        var blocks = RichTextParser.Parse("Don&#39;t quote &#34;me&#34;");
+        var p = Assert.IsType<BbParagraph>(Assert.Single(blocks));
+        Assert.Equal(new BbText("Don't quote \"me\""), Assert.Single(p.Inlines));
     }
 
     [Fact]

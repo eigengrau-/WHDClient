@@ -221,31 +221,7 @@ public static partial class HtmlParser
 
             var sub = new List<BbNode>();
             new Cursor(inner, sub).Run();
-            var inlines = new List<BbNode>();
-            void AppendInlines(IEnumerable<BbNode> add)
-            {
-                var list = add.ToList();
-                if (list.Count == 0) return;
-                if (inlines.Count > 0) inlines.Add(new BbText("\n"));
-                inlines.AddRange(list);
-            }
-            foreach (var b in sub)
-            {
-                switch (b)
-                {
-                    case BbParagraph p: AppendInlines(p.Inlines); break;
-                    case BbQuote q: AppendInlines(q.Inlines); break;
-                    case BbList l:
-                        foreach (var item in l.Items)
-                        {
-                            if (inlines.Count > 0) inlines.Add(new BbText("\n"));
-                            inlines.Add(new BbText("• "));
-                            inlines.AddRange(item);
-                        }
-                        break;
-                }
-            }
-            if (inlines.Count > 0) _blocks.Add(new BbQuote(inlines));
+            if (sub.Count > 0) _blocks.Add(new BbQuote(sub));
         }
 
         private void CloseParagraph()

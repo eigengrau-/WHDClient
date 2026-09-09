@@ -65,4 +65,21 @@ public class TicketDisplayTests
         // …so the ticket page shows the full detail alongside it.
         Assert.NotEmpty(t.DisplayDetail);
     }
+
+    [Fact]
+    public void RenderableDetail_PrefersDetail_WhenBothPresent()
+    {
+        var t = new Ticket { Detail = "full", ShortDetail = "snippet" };
+        Assert.Equal("full", t.RenderableDetail);
+    }
+
+    [Fact]
+    public void RenderableDetail_FallsBackToShortDetail_WhenDetailEmpty()
+    {
+        // WHD sometimes returns detail:"" with the real text only in shortDetail —
+        // an empty string must fall through, not just null.
+        var t = new Ticket { Detail = "", ShortDetail = "snippet" };
+        Assert.Equal("snippet", t.RenderableDetail);
+        Assert.Equal("snippet", t.DisplayDetail);
+    }
 }
